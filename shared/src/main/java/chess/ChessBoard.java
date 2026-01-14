@@ -70,6 +70,22 @@ public class ChessBoard {
     }
 
     @Override
+    public String toString() {
+        String str = "";
+        int lastIndex = board.length - 1;
+        for (int i = lastIndex; i >= 0; i--) {
+            ChessPiece[] row = board[i];
+            if (i != lastIndex) str += "|\n";
+            for (int j = 0; j < row.length; j++) {
+                str += "|";
+                str += ChessPiece.boardString(row[j]);
+            }
+        }
+
+        return str + "|";
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;

@@ -57,6 +57,46 @@ public class ChessPiece {
         throw new RuntimeException("Not implemented");
     }
 
+    public static String boardString(ChessPiece piece) {
+        if (piece == null) return " ";
+
+        String str;
+        switch (piece.type) {
+            case PieceType.KING:
+                str = "k";
+                break;
+            case PieceType.QUEEN:
+                str = "q";
+                break;
+            case PieceType.BISHOP:
+                str = "b";
+                break;
+            case PieceType.KNIGHT:
+                str = "n";
+                break;
+            case PieceType.ROOK:
+                str = "r";
+                break;
+            case PieceType.PAWN:
+                str = "p";
+                break;
+        
+            default:
+                str = " ";
+        }
+
+        if (piece.color == TeamColor.WHITE) {
+            return str.toUpperCase();
+        }
+
+        return str;
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece [type=" + type + ", color=" + color + "]";
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
