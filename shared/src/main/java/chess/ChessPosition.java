@@ -12,10 +12,6 @@ public class ChessPosition {
     private int col;
 
     public ChessPosition(int row, int col) {
-        if (row <= 0 || row > ChessBoard.HEIGHT || col <= 0 || col > ChessBoard.WIDTH) {
-            throw new RuntimeException("Invalid ChessPosition");
-        }
-
         this.row = row;
         this.col = col;
     }
@@ -34,6 +30,18 @@ public class ChessPosition {
      */
     public int getColumn() {
         return this.col;
+    }
+
+    public Boolean isValid() {
+        return (row > 0 && row <= ChessBoard.HEIGHT && col > 0 && col <= ChessBoard.WIDTH);
+    }
+
+    public ChessPosition plus(int dRow, int dCol) {
+        return new ChessPosition(this.row + dRow, this.col + dCol);
+    }
+
+    public ChessMove movingBy(int dRow, int dCol) {
+        return new ChessMove(this, this.plus(dRow, dCol), null);
     }
 
     /**
