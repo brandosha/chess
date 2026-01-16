@@ -58,12 +58,24 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         HashSet<ChessMove> moves = new HashSet<ChessMove>();
+
         if (this.type == PieceType.ROOK || this.type == PieceType.QUEEN) {
             moves.addAll(this.rookMoves(board, myPosition));
         }
         if (this.type == PieceType.BISHOP || this.type == PieceType.QUEEN) {
             moves.addAll(this.bishopMoves(board, myPosition));
         }
+        if (this.type == PieceType.KNIGHT) {
+            tryAddMove(moves, board, myPosition.movingBy(1, 2));
+            tryAddMove(moves, board, myPosition.movingBy(1, -2));
+            tryAddMove(moves, board, myPosition.movingBy(-1, 2));
+            tryAddMove(moves, board, myPosition.movingBy(-1, -2));
+            tryAddMove(moves, board, myPosition.movingBy(2, 1));
+            tryAddMove(moves, board, myPosition.movingBy(2, -1));
+            tryAddMove(moves, board, myPosition.movingBy(-2, 1));
+            tryAddMove(moves, board, myPosition.movingBy(-2, -1));
+        }
+
         return moves;
     }
 
@@ -79,8 +91,8 @@ public class ChessPiece {
         Vector<ChessMove> moves = new Vector<ChessMove>();
         moves.addAll(movesAlongPath(board, startPosition, 1, 1));
         moves.addAll(movesAlongPath(board, startPosition, 1, -1));
-        moves.addAll(movesAlongPath(board, startPosition, -1, -1));
         moves.addAll(movesAlongPath(board, startPosition, -1, 1));
+        moves.addAll(movesAlongPath(board, startPosition, -1, -1));
         
         return moves;
     }
