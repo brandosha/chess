@@ -1,9 +1,6 @@
 package chess;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Vector;
 
 import chess.ChessGame.TeamColor;
 
@@ -57,85 +54,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        HashSet<ChessMove> moves = new HashSet<ChessMove>();
-
-        if (this.type == PieceType.ROOK || this.type == PieceType.QUEEN) {
-            moves.addAll(this.rookMoves(board, myPosition));
-        }
-        if (this.type == PieceType.BISHOP || this.type == PieceType.QUEEN) {
-            moves.addAll(this.bishopMoves(board, myPosition));
-        }
-        if (this.type == PieceType.KNIGHT) {
-            tryAddMove(moves, board, myPosition.movingBy(1, 2));
-            tryAddMove(moves, board, myPosition.movingBy(1, -2));
-            tryAddMove(moves, board, myPosition.movingBy(-1, 2));
-            tryAddMove(moves, board, myPosition.movingBy(-1, -2));
-            tryAddMove(moves, board, myPosition.movingBy(2, 1));
-            tryAddMove(moves, board, myPosition.movingBy(2, -1));
-            tryAddMove(moves, board, myPosition.movingBy(-2, 1));
-            tryAddMove(moves, board, myPosition.movingBy(-2, -1));
-        }
-        if (this.type == PieceType.KING) {
-            tryAddMove(moves, board, myPosition.movingBy(0, 1));
-            tryAddMove(moves, board, myPosition.movingBy(0, -1));
-            tryAddMove(moves, board, myPosition.movingBy(-1, 0));
-            tryAddMove(moves, board, myPosition.movingBy(1, 0));
-            tryAddMove(moves, board, myPosition.movingBy(1, 1));
-            tryAddMove(moves, board, myPosition.movingBy(1, -1));
-            tryAddMove(moves, board, myPosition.movingBy(-1, 1));
-            tryAddMove(moves, board, myPosition.movingBy(-1, -1));
-        }
-
-        return moves;
-    }
-
-    private Boolean tryAddMove(Collection<ChessMove> moves, ChessBoard board, ChessMove move) {
-        if (!move.getEndPosition().isValid()) return false;
-        ChessPiece otherPiece = board.getPiece(move.getEndPosition());
-        if (otherPiece != null && otherPiece.color == this.color) return false;
-        moves.add(move);
-        return true;
-    }
-
-    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition startPosition) {
-        Vector<ChessMove> moves = new Vector<ChessMove>();
-        moves.addAll(movesAlongPath(board, startPosition, 1, 1));
-        moves.addAll(movesAlongPath(board, startPosition, 1, -1));
-        moves.addAll(movesAlongPath(board, startPosition, -1, 1));
-        moves.addAll(movesAlongPath(board, startPosition, -1, -1));
-        
-        return moves;
-    }
-
-    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition startPosition) {
-        Vector<ChessMove> moves = new Vector<ChessMove>();
-        moves.addAll(movesAlongPath(board, startPosition, 1, 0));
-        moves.addAll(movesAlongPath(board, startPosition, -1, 0));
-        moves.addAll(movesAlongPath(board, startPosition, 0, 1));
-        moves.addAll(movesAlongPath(board, startPosition, 0, -1));
-        
-        return moves;
-    }
-
-    private Collection<ChessMove> movesAlongPath(ChessBoard board, ChessPosition startPosition, int dRow, int dCol) {
-        Vector<ChessMove> moves = new Vector<ChessMove>();
-
-        ChessPosition endPosition = startPosition.plus(dRow, dCol);
-        while (endPosition.isValid()) {
-            ChessPiece otherPiece = board.getPiece(endPosition);
-            if (otherPiece == null) {
-                moves.add(new ChessMove(startPosition, endPosition, null));
-            } else {
-                if (otherPiece.color != this.color) {
-                    moves.add(new ChessMove(startPosition, endPosition, null));
-                }
-                break;
-            }
-
-            endPosition = endPosition.plus(dRow, dCol);
-        }
-
-        return moves;
+        return new ChessMoves(board, myPosition);
     }
 
     public static String boardString(ChessPiece piece) {
