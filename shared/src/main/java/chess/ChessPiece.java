@@ -75,6 +75,16 @@ public class ChessPiece {
             tryAddMove(moves, board, myPosition.movingBy(-2, 1));
             tryAddMove(moves, board, myPosition.movingBy(-2, -1));
         }
+        if (this.type == PieceType.KING) {
+            tryAddMove(moves, board, myPosition.movingBy(0, 1));
+            tryAddMove(moves, board, myPosition.movingBy(0, -1));
+            tryAddMove(moves, board, myPosition.movingBy(-1, 0));
+            tryAddMove(moves, board, myPosition.movingBy(1, 0));
+            tryAddMove(moves, board, myPosition.movingBy(1, 1));
+            tryAddMove(moves, board, myPosition.movingBy(1, -1));
+            tryAddMove(moves, board, myPosition.movingBy(-1, 1));
+            tryAddMove(moves, board, myPosition.movingBy(-1, -1));
+        }
 
         return moves;
     }
