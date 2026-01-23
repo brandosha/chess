@@ -2,19 +2,23 @@ package chess;
 
 import java.util.HashSet;
 
+import chess.ChessGame.TeamColor;
 import chess.ChessPiece.PieceType;
 
 public class ChessMoves extends HashSet<ChessMove> {
   private ChessBoard board;
   private ChessPosition startPosition;
   private ChessPiece startPiece;
+  private static final PieceType[] ALL_PROMOTIONS = {
+    PieceType.QUEEN, PieceType.ROOK, PieceType.KNIGHT, PieceType.BISHOP
+  };
 
   public ChessMoves(ChessBoard board, ChessPosition startPosition) {
     this.board = board;
     this.startPosition = startPosition;
     this.startPiece = board.getPiece(startPosition);
 
-    addMoves(this.startPiece.getPieceType());
+    addMoves(this.startPiece.getPieceType(), this.startPiece.getTeamColor());
   }
 
   public ChessMoves(ChessPiece piece, ChessBoard board, ChessPosition startPosition) {
@@ -22,10 +26,10 @@ public class ChessMoves extends HashSet<ChessMove> {
     this.startPosition = startPosition;
     this.startPiece = piece;
 
-    addMoves(piece.getPieceType());
+    addMoves(piece.getPieceType(), piece.getTeamColor());
   }
 
-  private void addMoves(PieceType pieceType) {
+  private void addMoves(PieceType pieceType, TeamColor pieceColor) {
     if (pieceType == PieceType.ROOK || pieceType == PieceType.QUEEN) {
       addHorizontalMoves();
     }
@@ -43,6 +47,65 @@ public class ChessMoves extends HashSet<ChessMove> {
       addMoveIfValid(1, 0);
       addMoveIfValid(-1, 0);
     }
+    if (pieceType == PieceType.PAWN) {
+      int direction = pieceColor == TeamColor.WHITE ? 1 : -1;
+      addPawnForwardMoves(direction);
+      addPawnCaptures(direction, pieceColor);
+      addEnPassant(direction);
+    } 
+  }
+
+  private void addPawnForwardMoves(int direction) {
+    int curRow = startPosition.getRow();
+    ChessPosition oneForward = startPosition.plus(direction, 0);
+    // The pawn will be moving to the last row so it needs to promote
+    if (curRow + direction == 1 || curRow + direction == 8) {
+      for (PieceType promotionType : ALL_PROMOTIONS) {
+        this.add(new ChessMove(startPosition, oneForward, promotionType));
+      }
+    } else if (this.board.getPiece(oneForward) == null) {
+      this.add(new ChessMove(startPosition, oneForward, null));
+      // The pawn is on it's starting row so it may be able to move forward two spaces
+      if (curRow - direction == 1 || curRow - direction == 8) {
+        ChessPosition twoForward = oneForward.plus(direction, 0);
+        if (this.board.getPiece(twoForward) == null) {
+          this.add(new ChessMove(startPosition, twoForward, null));
+        }
+      }
+    }
+  }
+
+  private void addPawnCaptures(int direction, TeamColor color) {
+    int curRow = startPosition.getRow();
+    Boolean willPromote = curRow + direction == 8 || curRow + direction == 1;
+    ChessPosition upLeft = startPosition.plus(direction, -1);
+    ChessPiece leftPiece = upLeft.isValid() ? board.getPiece(upLeft) : null;
+    ChessPosition upRight = startPosition.plus(direction, 1);
+    ChessPiece rightPiece = upRight.isValid() ? board.getPiece(upRight) : null;
+
+    if (leftPiece != null && leftPiece.getTeamColor() != color) {
+      if (willPromote) {
+        for (PieceType promotionType : ALL_PROMOTIONS) {
+          this.add(new ChessMove(startPosition, upLeft, promotionType));
+        }
+      } else {
+        this.add(new ChessMove(startPosition, upLeft, null));
+      }
+    }
+
+    if (rightPiece != null && rightPiece.getTeamColor() != color) {
+      if (willPromote) {
+        for (PieceType promotionType : ALL_PROMOTIONS) {
+          this.add(new ChessMove(startPosition, upRight, promotionType));
+        }
+      } else {
+        this.add(new ChessMove(startPosition, upRight, null));
+      }
+    }
+  }
+
+  private void addEnPassant(int direction) {
+    // TODO: add logic for en passant
   }
 
   private void addDiagonalSymmetry(int dRow, int dCol) {
@@ -52,9 +115,6 @@ public class ChessMoves extends HashSet<ChessMove> {
     addMoveIfValid(-dRow, -dCol);
   }
 
-  private void addMoveIfValid(int dRow, int dCol, PieceType promotionPiece) {
-    this.add(newMoveIfValid(dRow, dCol, promotionPiece));
-  }
   private void addMoveIfValid(int dRow, int dCol) {
     this.add(newMoveIfValid(dRow, dCol, null));
   }
