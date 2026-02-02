@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 import chess.ChessGame.TeamColor;
 import chess.ChessPiece.PieceType;
@@ -105,5 +106,55 @@ public class ChessBoard {
         if (!Arrays.deepEquals(board, other.board))
             return false;
         return true;
+    }
+
+    public static class Square {
+        public final int row;
+        public final int col;
+        public final ChessPiece piece;
+
+        public Square(int row, int col, ChessPiece piece) {
+            this.row = row;
+            this.col = col;
+            this.piece = piece;
+        }
+
+        public ChessPosition getPosition() {
+            return new ChessPosition(row, col);
+        }
+    }
+
+    SquareIterator squares() {
+        return new SquareIterator();
+    }
+
+    private class SquareIterator implements Iterator<Square>, Iterable<Square> {
+        int r = 0;
+        int c = 0;
+
+        public SquareIterator() {
+        }
+
+        @Override
+        public boolean hasNext() {
+            return r < HEIGHT && c < WIDTH;
+        }
+
+        @Override
+        public Square next() {
+            c += 1;
+            if (c >= WIDTH) {
+                r += 1;
+                c = 0;
+            }
+
+            ChessPiece piece = board[r][c];
+            return new Square(r, c, piece);
+        }
+
+        @Override
+        public Iterator<Square> iterator() {
+            return this;
+        }
     }
 }

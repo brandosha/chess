@@ -31,27 +31,23 @@ public class ChessMoves extends HashSet<ChessMove> {
 
   private void addMoves(PieceType pieceType, TeamColor pieceColor) {
     if (pieceType == PieceType.ROOK || pieceType == PieceType.QUEEN) {
-      addHorizontalMoves();
+      addRookMoves();
     }
     if (pieceType == PieceType.BISHOP || pieceType == PieceType.QUEEN) {
-      addDiagonalMoves();
+      addBishopMoves();
     }
     if (pieceType == PieceType.KNIGHT) {
-      addDiagonalSymmetry(1, 2);
-      addDiagonalSymmetry(2, 1);
+      add4x(1, 2);
+      add4x(2, 1);
     }
     if (pieceType == PieceType.KING) {
-      addDiagonalSymmetry(1, 1);
-      addMoveIfValid(0, 1);
-      addMoveIfValid(0, -1);
-      addMoveIfValid(1, 0);
-      addMoveIfValid(-1, 0);
+      add4x(1, 1);
+      add4x(0, 1);
     }
     if (pieceType == PieceType.PAWN) {
       int direction = pieceColor == TeamColor.WHITE ? 1 : -1;
       addPawnForwardMoves(direction);
       addPawnCaptures(direction, pieceColor);
-      addEnPassant(direction);
     } 
   }
 
@@ -104,15 +100,11 @@ public class ChessMoves extends HashSet<ChessMove> {
     }
   }
 
-  private void addEnPassant(int direction) {
-    // TODO: add logic for en passant
-  }
-
-  private void addDiagonalSymmetry(int dRow, int dCol) {
-    addMoveIfValid( dRow,  dCol);
-    addMoveIfValid( dRow, -dCol);
-    addMoveIfValid(-dRow,  dCol);
+  private void add4x(int dRow, int dCol) {
+    addMoveIfValid(dRow, dCol);
+    addMoveIfValid(-dCol, dRow);
     addMoveIfValid(-dRow, -dCol);
+    addMoveIfValid(dCol, -dRow);
   }
 
   private void addMoveIfValid(int dRow, int dCol) {
@@ -129,14 +121,14 @@ public class ChessMoves extends HashSet<ChessMove> {
     return new ChessMove(startPosition, endPosition, promotionPiece);
   }
 
-  private void addHorizontalMoves() {
+  private void addRookMoves() {
     addMovesAlongPath(0, 1);
     addMovesAlongPath(0, -1);
     addMovesAlongPath(1, 0);
     addMovesAlongPath(-1, 0);
   }
 
-  private void addDiagonalMoves() {
+  private void addBishopMoves() {
     addMovesAlongPath(1, 1);
     addMovesAlongPath(1, -1);
     addMovesAlongPath(-1, 1);
@@ -144,7 +136,6 @@ public class ChessMoves extends HashSet<ChessMove> {
   }
 
   private void addMovesAlongPath(int dRow, int dCol) {
-
     ChessPosition endPosition = startPosition.plus(dRow, dCol);
     while (endPosition.isValid()) {
       ChessPiece endPiece = board.getPiece(endPosition);
@@ -159,7 +150,16 @@ public class ChessMoves extends HashSet<ChessMove> {
 
       endPosition = endPosition.plus(dRow, dCol);
     }
+  }
 
+  public Boolean hasMoveTo(ChessPosition pos) {
+    for (ChessMove move : this) {
+      if (move.getEndPosition().equals(pos)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   @Override

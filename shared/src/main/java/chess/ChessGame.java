@@ -2,6 +2,9 @@ package chess;
 
 import java.util.Collection;
 
+import chess.ChessBoard.Square;
+import chess.ChessPiece.PieceType;
+
 /**
  * For a class that can manage a chess game, making moves on a board
  * <p>
@@ -10,15 +13,20 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    public ChessGame() {
+    private ChessBoard board;
+    private TeamColor turn;
 
+    public ChessGame() {
+        this.board = new ChessBoard();
+        this.board.resetBoard();
+        this.turn = TeamColor.WHITE;
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return this.turn;
     }
 
     /**
@@ -27,7 +35,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        this.turn = team;
     }
 
     /**
@@ -46,7 +54,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        return new ChessMoves(board, startPosition);
     }
 
     /**
@@ -56,7 +64,32 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPosition startPos = move.getStartPosition();
+        ChessPiece movingPiece = board.getPiece(startPos);
+        if (movingPiece == null) {
+            throw new InvalidMoveException("No piece at " + startPos);
+        }
+        if (movingPiece.getTeamColor() != this.turn) {
+            throw new InvalidMoveException("Moving out of turn");
+        }
+
+        if (!validMoves(startPos).contains(move)) {
+            throw new InvalidMoveException();
+        }
+
+        board.addPiece(move.getStartPosition(), null);
+        PieceType promotionPiece = move.getPromotionPiece();
+        if (promotionPiece != null) {
+            board.addPiece(move.getEndPosition(), new ChessPiece(movingPiece.getTeamColor(), promotionPiece));
+        } else {
+            board.addPiece(move.getEndPosition(), movingPiece);
+        }
+        
+        if (this.turn == TeamColor.WHITE) {
+            this.turn = TeamColor.BLACK;
+        } else {
+            this.turn = TeamColor.WHITE;
+        }
     }
 
     /**
@@ -96,7 +129,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
@@ -105,6 +138,46 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return board;
+    }
+
+    private Boolean squareDefended(ChessPosition pos, TeamColor byTeam) {
+        for (Square s : board.squares()) {
+            if (s.piece == null || s.piece.getTeamColor() != byTeam) { continue; }
+            ChessMoves moves = new ChessMoves(board, s.getPosition());
+            if (moves.hasMoveTo(pos)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((board == null) ? 0 : board.hashCode());
+        result = prime * result + ((turn == null) ? 0 : turn.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ChessGame other = (ChessGame) obj;
+        if (board == null) {
+            if (other.board != null)
+                return false;
+        } else if (!board.equals(other.board))
+            return false;
+        if (turn != other.turn)
+            return false;
+        return true;
     }
 }
