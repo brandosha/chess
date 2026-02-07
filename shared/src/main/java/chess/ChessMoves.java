@@ -113,10 +113,10 @@ public class ChessMoves extends HashSet<ChessMove> {
 
   private ChessMove newMoveIfValid(int dRow, int dCol, PieceType promotionPiece) {
     ChessPosition endPosition = startPosition.plus(dRow, dCol);
-    if (!endPosition.isValid()) return null;
+    if (!endPosition.isValid()) { return null; }
 
     ChessPiece endPiece = board.getPiece(endPosition);
-    if (endPiece != null && endPiece.getTeamColor() == startPiece.getTeamColor()) return null;
+    if (endPiece != null && endPiece.getTeamColor() == startPiece.getTeamColor()) { return null; }
 
     return new ChessMove(startPosition, endPosition, promotionPiece);
   }
@@ -164,7 +164,7 @@ public class ChessMoves extends HashSet<ChessMove> {
 
   @Override
   public boolean add(ChessMove move) {
-    if (move == null) return false;
+    if (move == null) { return false; }
     return super.add(move);
   }
 }

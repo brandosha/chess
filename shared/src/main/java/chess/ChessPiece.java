@@ -58,7 +58,7 @@ public class ChessPiece {
     }
 
     public static String boardString(ChessPiece piece) {
-        if (piece == null) return " ";
+        if (piece == null) { return " "; }
 
         String str;
         switch (piece.type) {
