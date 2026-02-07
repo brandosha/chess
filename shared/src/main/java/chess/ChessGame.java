@@ -137,6 +137,17 @@ public class ChessGame {
         } else if (rooks[3].equals(startPos) || rooks[3].equals(endPos)) {
             canRightCastle[1] = false;
         }
+
+        // Keep track of the en passant square
+        enPassantPos = null;
+        if (movingPiece.getPieceType() == PieceType.PAWN) {
+            int dist = endPos.getRow() - startPos.getRow();
+            if (dist == 2) {
+                enPassantPos = startPos.plus(1, 0);
+            } else if (dist == -2) {
+                enPassantPos = startPos.plus(-1, 0);
+            }
+        }
     }
 
     /**
@@ -240,7 +251,6 @@ public class ChessGame {
         }
 
         if (!canLeftCastle[castlingIndex] && !canRightCastle[castlingIndex]) { return; }
-
         
         if (
             canLeftCastle[castlingIndex] &&
@@ -265,7 +275,6 @@ public class ChessGame {
 
     private Boolean makeCastlingMove(ChessMove move) {
         int backRank = 1;
-        
 
         ChessPosition startPos = move.getStartPosition();
         ChessPosition endPos = move.getEndPosition();
@@ -303,11 +312,37 @@ public class ChessGame {
     }
 
     private void addEnPassantMoves(ChessPosition startPos, Collection<ChessMove> moves) {
-        // TODO
+        if (enPassantPos == null) { return; }
+
+        ChessPiece movingPiece = board.getPiece(startPos);
+        if (movingPiece.getPieceType() != PieceType.PAWN) { return; }
+
+        int direction = movingPiece.getTeamColor() == TeamColor.BLACK ? -1 : 1;
+        int rowDifference = enPassantPos.getRow() - startPos.getRow();
+        if (rowDifference != direction) { return; }
+
+        int colDifference = enPassantPos.getColumn() - startPos.getColumn();
+        if (colDifference == 1 || colDifference == -1) {
+            moves.add(new ChessMove(startPos, enPassantPos, null));
+        }
     }
 
     private Boolean makeEnPassantMove(ChessMove move) {
-        return false;
+        ChessPosition startPos = move.getStartPosition();
+        ChessPiece movingPiece = board.getPiece(startPos);
+        if (movingPiece.getPieceType() != PieceType.PAWN) {
+            return false;
+        }
+
+        if (!move.getEndPosition().equals(enPassantPos)) {
+            return false;
+        }
+
+        int direction = movingPiece.getTeamColor() == TeamColor.BLACK ? 1 : -1;
+        board.makeMove(move);
+        board.addPiece(enPassantPos.plus(direction, 0), null);
+        enPassantPos = null;
+        return true;
     }
 
     @Override
