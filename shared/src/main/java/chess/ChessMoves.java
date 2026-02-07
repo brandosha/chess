@@ -8,7 +8,7 @@ import chess.ChessPiece.PieceType;
 public class ChessMoves extends HashSet<ChessMove> {
   private final ChessBoard board;
   private final ChessPosition startPosition;
-  private final ChessPiece startPiece;
+  final ChessPiece startPiece;
   private static final PieceType[] ALL_PROMOTIONS = {
     PieceType.QUEEN, PieceType.ROOK, PieceType.KNIGHT, PieceType.BISHOP
   };

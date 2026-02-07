@@ -57,15 +57,16 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         var safeMoves = new ArrayList<ChessMove>();
         var pieceMoves = new ChessMoves(board, startPosition);
-        var king = new ChessPiece(turn, PieceType.KING);
+        var teamColor = pieceMoves.startPiece.getTeamColor();
+        var king = new ChessPiece(teamColor, PieceType.KING);
 
         for (ChessMove move : pieceMoves) {
             ChessBoard boardWithMove = board.withMove(move);
             var kingPos = boardWithMove.piecePos(king);
-            var otherTeam = turn == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK;
+            var otherTeam = teamColor == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK;
             if (!squareDefended(boardWithMove, kingPos, otherTeam)) {
                 safeMoves.add(move);
-            };
+            }
         }
 
         return safeMoves;
@@ -129,7 +130,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return isInCheck(teamColor) && teamHasNoValidMoves(teamColor);
     }
 
     /**
@@ -140,7 +141,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return !isInCheck(teamColor) && teamHasNoValidMoves(teamColor);
     }
 
     /**
@@ -159,6 +160,18 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    private Boolean teamHasNoValidMoves(TeamColor team) {
+        for (Square s : board.squares()) {
+            if (s.piece == null || s.piece.getTeamColor() != team) { continue; }
+            var moves = validMoves(s.getPosition());
+            if (!moves.isEmpty()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static Boolean squareDefended(ChessBoard board, ChessPosition pos, TeamColor byTeam) {
