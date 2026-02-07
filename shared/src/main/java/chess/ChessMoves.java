@@ -6,9 +6,9 @@ import chess.ChessGame.TeamColor;
 import chess.ChessPiece.PieceType;
 
 public class ChessMoves extends HashSet<ChessMove> {
-  private ChessBoard board;
-  private ChessPosition startPosition;
-  private ChessPiece startPiece;
+  private final ChessBoard board;
+  private final ChessPosition startPosition;
+  private final ChessPiece startPiece;
   private static final PieceType[] ALL_PROMOTIONS = {
     PieceType.QUEEN, PieceType.ROOK, PieceType.KNIGHT, PieceType.BISHOP
   };

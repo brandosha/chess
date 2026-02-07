@@ -22,6 +22,12 @@ public class ChessBoard {
         // this.resetBoard();
     }
 
+    public ChessBoard(ChessBoard other) {
+        for (int i = 0; i < HEIGHT; i++) {
+            this.board[i] = other.board[i].clone();
+        }
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
@@ -128,7 +134,7 @@ public class ChessBoard {
         return new SquareIterator();
     }
 
-    private class SquareIterator implements Iterator<Square>, Iterable<Square> {
+    class SquareIterator implements Iterator<Square>, Iterable<Square> {
         int r = 0;
         int c = 0;
 
@@ -137,7 +143,7 @@ public class ChessBoard {
 
         @Override
         public boolean hasNext() {
-            return r < HEIGHT && c < WIDTH;
+            return (r + 1) < HEIGHT || (c + 1) < WIDTH;
         }
 
         @Override
@@ -149,12 +155,49 @@ public class ChessBoard {
             }
 
             ChessPiece piece = board[r][c];
-            return new Square(r, c, piece);
+            return new Square(r + 1, c + 1, piece);
         }
 
         @Override
         public Iterator<Square> iterator() {
             return this;
         }
+    }
+
+    public ChessPosition piecePos(ChessPiece findPiece) {
+        for (int r = 0; r < board.length; r++) {
+            ChessPiece[] row = board[r];
+            for (int c = 0; c < row.length; c++) {
+                ChessPiece piece = row[c];
+                if (findPiece.equals(piece)) {
+                    return new ChessPosition(r + 1, c + 1);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public ChessBoard clone() {
+        return new ChessBoard(this);
+    }
+
+    public void makeMove(ChessMove move) {
+        ChessPosition startPos = move.getStartPosition();
+        ChessPiece movingPiece = getPiece(startPos);
+
+        addPiece(move.getStartPosition(), null);
+        PieceType promotionPiece = move.getPromotionPiece();
+        if (promotionPiece != null) {
+            addPiece(move.getEndPosition(), new ChessPiece(movingPiece.getTeamColor(), promotionPiece));
+        } else {
+            addPiece(move.getEndPosition(), movingPiece);
+        }
+    }
+
+    public ChessBoard withMove(ChessMove move) {
+        var newBoard = clone();
+        newBoard.makeMove(move);
+        return newBoard;
     }
 }

@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import chess.ChessBoard.Square;
@@ -54,7 +55,20 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        return new ChessMoves(board, startPosition);
+        var safeMoves = new ArrayList<ChessMove>();
+        var pieceMoves = new ChessMoves(board, startPosition);
+        var king = new ChessPiece(turn, PieceType.KING);
+
+        for (ChessMove move : pieceMoves) {
+            ChessBoard boardWithMove = board.withMove(move);
+            var kingPos = boardWithMove.piecePos(king);
+            var otherTeam = turn == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK;
+            if (!squareDefended(boardWithMove, kingPos, otherTeam)) {
+                safeMoves.add(move);
+            };
+        }
+
+        return safeMoves;
     }
 
     /**
@@ -77,13 +91,7 @@ public class ChessGame {
             throw new InvalidMoveException();
         }
 
-        board.addPiece(move.getStartPosition(), null);
-        PieceType promotionPiece = move.getPromotionPiece();
-        if (promotionPiece != null) {
-            board.addPiece(move.getEndPosition(), new ChessPiece(movingPiece.getTeamColor(), promotionPiece));
-        } else {
-            board.addPiece(move.getEndPosition(), movingPiece);
-        }
+        board.makeMove(move);
         
         if (this.turn == TeamColor.WHITE) {
             this.turn = TeamColor.BLACK;
@@ -99,7 +107,19 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        Square kingSquare = null;
+        for (Square square : board.squares()) {
+            if (
+                square.piece != null && 
+                square.piece.getPieceType() == PieceType.KING && 
+                square.piece.getTeamColor() == teamColor
+            ) {
+                kingSquare = square;
+            }
+        }
+
+        TeamColor otherTeam = teamColor == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+        return squareDefended(kingSquare.getPosition(), otherTeam);
     }
 
     /**
@@ -141,7 +161,7 @@ public class ChessGame {
         return board;
     }
 
-    private Boolean squareDefended(ChessPosition pos, TeamColor byTeam) {
+    private static Boolean squareDefended(ChessBoard board, ChessPosition pos, TeamColor byTeam) {
         for (Square s : board.squares()) {
             if (s.piece == null || s.piece.getTeamColor() != byTeam) { continue; }
             ChessMoves moves = new ChessMoves(board, s.getPosition());
@@ -151,6 +171,10 @@ public class ChessGame {
         }
 
         return false;
+    }
+
+    private Boolean squareDefended(ChessPosition pos, TeamColor byTeam) {
+        return squareDefended(board, pos, byTeam);
     }
 
     @Override
