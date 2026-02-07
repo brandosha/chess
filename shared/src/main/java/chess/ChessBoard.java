@@ -143,19 +143,22 @@ public class ChessBoard {
 
         @Override
         public boolean hasNext() {
-            return (r + 1) < HEIGHT || (c + 1) < WIDTH;
+            return r < HEIGHT;
         }
 
         @Override
         public Square next() {
+            ChessPiece piece = board[r][c];
+            int row = r + 1;
+            int col = c + 1;
+
             c += 1;
             if (c >= WIDTH) {
                 r += 1;
                 c = 0;
             }
 
-            ChessPiece piece = board[r][c];
-            return new Square(r + 1, c + 1, piece);
+            return new Square(row, col, piece);
         }
 
         @Override
