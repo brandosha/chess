@@ -239,6 +239,7 @@ public class ChessGame {
         if (squareDefended(startPos, otherTeam)) { return; }
 
         int castlingIndex = 0;
+        
         ChessPosition[] leftCastle = { new ChessPosition(1, 3), new ChessPosition(1, 4) };
         ChessPosition[] rightCastle = { new ChessPosition(1, 7), new ChessPosition(1, 6) };
 
@@ -252,8 +253,12 @@ public class ChessGame {
 
         if (!canLeftCastle[castlingIndex] && !canRightCastle[castlingIndex]) { return; }
         
+        int backRank = team == TeamColor.WHITE ? 1 : 8;
+        ChessPiece leftRook = board.getPiece(new ChessPosition(backRank, 1));
+        ChessPiece rightRook = board.getPiece(new ChessPosition(backRank, 1));
         if (
             canLeftCastle[castlingIndex] &&
+            leftRook != null && leftRook.getPieceType() == PieceType.ROOK &&
             board.getPiece(leftCastle[0]) == null &&
             board.getPiece(leftCastle[1]) == null &&
             !squareDefended(leftCastle[0], otherTeam) && 
@@ -264,6 +269,7 @@ public class ChessGame {
 
         if (
             canRightCastle[castlingIndex] &&
+            rightRook != null && rightRook.getPieceType() == PieceType.ROOK &&
             board.getPiece(rightCastle[0]) == null &&
             board.getPiece(rightCastle[1]) == null &&
             !squareDefended(rightCastle[0], otherTeam) && 
