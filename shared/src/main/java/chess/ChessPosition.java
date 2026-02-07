@@ -40,10 +40,6 @@ public class ChessPosition {
         return new ChessPosition(this.row + dRow, this.col + dCol);
     }
 
-    public ChessMove movingBy(int dRow, int dCol) {
-        return new ChessMove(this, this.plus(dRow, dCol), null);
-    }
-
     /**
      * @return array row index
      */

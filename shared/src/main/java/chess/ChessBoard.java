@@ -82,7 +82,7 @@ public class ChessBoard {
         int lastIndex = board.length - 1;
         for (int i = lastIndex; i >= 0; i--) {
             ChessPiece[] row = board[i];
-            if (i != lastIndex) str += "|\n";
+            if (i != lastIndex) { str += "|\n"; }
             for (int j = 0; j < row.length; j++) {
                 str += "|";
                 str += ChessPiece.boardString(row[j]);
