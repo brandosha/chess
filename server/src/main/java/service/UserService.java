@@ -6,7 +6,7 @@ import datamodel.http.RegisterRequest;
 import datamodel.http.RegisterResponse;
 
 public class UserService {
-  public UserDao dao;
+  private final UserDao dao;
 
   public UserService(UserDao dao) {
     this.dao = dao;
