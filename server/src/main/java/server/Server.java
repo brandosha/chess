@@ -19,12 +19,12 @@ public class Server {
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
-
         var db = new DatabaseMemory();
-        // Register your endpoints and exception handlers here.
+        
         var userHandler = new UserHandler(db);
         javalin.post("/user", userHandler::register);
         javalin.post("/session", userHandler::login);
+        javalin.delete("/session", userHandler::logout);
 
         var dataHandler = new DataHandler(db);
         javalin.delete("/db", dataHandler::clearDb);

@@ -35,11 +35,18 @@ public class UserService extends BaseService {
 
     var user = dao.getUser(req.username);
     if (user == null || !user.checkPassword(req.password)) {
-      throw new UnauthorizedException("unauthorized");
+      throw new UnauthorizedException();
     }
 
     var authData = AuthData.generate(user.username);
     dao.insertAuth(authData);
     return new LoginResponse(authData);
+  }
+
+  public void logout(String authToken) throws UnauthorizedException {
+    checkAuth(authToken);
+    
+    var dao = db.userDao();
+    dao.deleteAuth(authToken);
   }
 }

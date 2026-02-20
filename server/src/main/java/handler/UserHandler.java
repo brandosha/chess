@@ -26,4 +26,10 @@ public class UserHandler extends BaseHandler {
     var res = service.login(req);
     ctx.result(gson.toJson(res));
   }
+
+  public void logout(Context ctx) throws Exception {
+    var authToken = ctx.header("Authorization");
+    service.logout(authToken);
+    ctx.result("{}");
+  }
 }

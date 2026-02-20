@@ -8,5 +8,7 @@ public interface UserDao extends DataAccessObject {
   public UserData getUser(String username);
 
   public void insertAuth(AuthData auth);
+  public AuthData getAuth(String authToken);
+  public AuthData deleteAuth(String authToken);
   public UserData getAuthUser(String authToken);
 }

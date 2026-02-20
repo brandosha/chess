@@ -30,6 +30,16 @@ public class UserDaoMemory implements UserDao {
   }
 
   @Override
+  public AuthData getAuth(String authToken) {
+    return authTokens.get(authToken);
+  }
+
+  @Override
+  public AuthData deleteAuth(String authToken) {
+    return authTokens.remove(authToken);
+  }
+
+  @Override
   public UserData getAuthUser(String authToken) {
     var auth = authTokens.get(authToken);
     if (auth == null) { return null; }
