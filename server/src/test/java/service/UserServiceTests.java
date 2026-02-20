@@ -3,17 +3,19 @@ package service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import dataaccess.Database;
 import dataaccess.DatabaseMemory;
 import datamodel.http.RegisterRequest;
 
 public class UserServiceTests {
 
   UserService service;
+  Database db;
 
   @BeforeEach
   void beforeEach() {
-    var db = new DatabaseMemory();
-    this.service = new UserService(db);
+    db = new DatabaseMemory();
+    service = new UserService(db);
   }
   
   @Test
@@ -22,5 +24,10 @@ public class UserServiceTests {
     var res = service.register(req);
 
     assert res.username.equals(req.username);
+  }
+
+  @Test
+  public void registerNegative() throws Exception {
+    
   }
 }

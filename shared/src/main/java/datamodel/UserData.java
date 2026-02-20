@@ -10,4 +10,8 @@ public class UserData {
     this.password = password;
     this.email = email;
   }
+
+  public Boolean checkPassword(String pw) {
+    return pw.equals(this.password);
+  }
 }

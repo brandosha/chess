@@ -10,6 +10,7 @@ import handler.UserHandler;
 import io.javalin.Javalin;
 import io.javalin.http.ExceptionHandler;
 import service.AlreadyTakenException;
+import service.UnauthorizedException;
 
 public class Server {
 
@@ -23,12 +24,14 @@ public class Server {
         // Register your endpoints and exception handlers here.
         var userHandler = new UserHandler(db);
         javalin.post("/user", userHandler::register);
+        javalin.post("/session", userHandler::login);
 
         var dataHandler = new DataHandler(db);
         javalin.delete("/db", dataHandler::clearDb);
 
-        javalin.exception(AlreadyTakenException.class, excHandler(403));
         javalin.exception(InvalidRequestException.class, excHandler(400));
+        javalin.exception(UnauthorizedException.class, excHandler(401));
+        javalin.exception(AlreadyTakenException.class, excHandler(403));
         javalin.exception(Exception.class, excHandler(500));
 
     }
