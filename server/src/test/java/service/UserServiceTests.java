@@ -3,8 +3,7 @@ package service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import dataaccess.UserDao;
-import dataaccess.UserDaoMemory;
+import dataaccess.DatabaseMemory;
 import datamodel.http.RegisterRequest;
 
 public class UserServiceTests {
@@ -13,8 +12,8 @@ public class UserServiceTests {
 
   @BeforeEach
   void beforeEach() {
-    UserDao dao = new UserDaoMemory();
-    this.service = new UserService(dao);
+    var db = new DatabaseMemory();
+    this.service = new UserService(db);
   }
   
   @Test

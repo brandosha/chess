@@ -35,4 +35,10 @@ public class UserDaoMemory implements UserDao {
     if (auth == null) { return null; }
     return users.get(auth.username);
   }
+
+  @Override
+  public void clear() {
+    users.clear();
+    authTokens.clear();
+  }
 }

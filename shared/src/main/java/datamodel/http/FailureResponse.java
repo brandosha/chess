@@ -8,6 +8,6 @@ public class FailureResponse {
   }
 
   public FailureResponse(Exception err) {
-    this.message = err.getMessage();
+    this.message = "Error: " + err.getMessage();
   }
 }

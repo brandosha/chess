@@ -2,39 +2,43 @@ package server;
 
 import com.google.gson.Gson;
 
-import dataaccess.UserDaoMemory;
+import dataaccess.DatabaseMemory;
 import datamodel.http.FailureResponse;
+import datamodel.http.InvalidRequestException;
+import handler.DataHandler;
 import handler.UserHandler;
 import io.javalin.Javalin;
+import io.javalin.http.ExceptionHandler;
 import service.AlreadyTakenException;
 
 public class Server {
 
     private final Javalin javalin;
+    private final Gson gson = new Gson();
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
+        var db = new DatabaseMemory();
         // Register your endpoints and exception handlers here.
-        var userDao = new UserDaoMemory();
-        var userHandler = new UserHandler(userDao);
+        var userHandler = new UserHandler(db);
         javalin.post("/user", userHandler::register);
 
-        Gson gson = new Gson();
+        var dataHandler = new DataHandler(db);
+        javalin.delete("/db", dataHandler::clearDb);
 
-        javalin.exception(AlreadyTakenException.class, (err, ctx) -> {
-            System.err.println("AlreadyTakenException " + err);
-            ctx.status(403);
+        javalin.exception(AlreadyTakenException.class, excHandler(403));
+        javalin.exception(InvalidRequestException.class, excHandler(400));
+        javalin.exception(Exception.class, excHandler(500));
+
+    }
+
+    private ExceptionHandler<Exception> excHandler(int status) {
+        return (err, ctx) -> {
+            System.err.println(err);
+            ctx.status(status);
             ctx.result(gson.toJson(new FailureResponse(err)));
-        });
-
-        // General exception handler
-        javalin.exception(Exception.class, (err, ctx) -> {
-            System.err.println("Exception " + err);
-            ctx.status(500);
-            ctx.result(gson.toJson(new FailureResponse(err)));
-        });
-
+        };
     }
 
     public int run(int desiredPort) {

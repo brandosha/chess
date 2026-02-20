@@ -3,7 +3,7 @@ package dataaccess;
 import datamodel.AuthData;
 import datamodel.UserData;
 
-public interface UserDao {
+public interface UserDao extends DataAccessObject {
   public void insertUser(UserData user);
   public UserData getUser(String username);
 
