@@ -6,13 +6,8 @@ import datamodel.AuthData;
 import datamodel.UserData;
 
 public class UserDaoMemory implements UserDao {
-  private final HashMap<String, UserData> users;
-  private final HashMap<String, AuthData> authTokens;
-
-  public UserDaoMemory() {
-    users = new HashMap<>();
-    authTokens = new HashMap<>();
-  }
+  private final HashMap<String, UserData> users = new HashMap<>();
+  private final HashMap<String, AuthData> authTokens = new HashMap<>();
 
   @Override
   public void insertUser(UserData user) {

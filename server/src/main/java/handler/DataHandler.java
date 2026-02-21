@@ -12,7 +12,7 @@ public class DataHandler extends BaseHandler {
   }
 
   public void clearDb(Context ctx) {
-    db.userDao().clear();
+    db.clear();
     ctx.result("{}");
   }
 }

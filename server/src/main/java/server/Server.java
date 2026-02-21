@@ -6,6 +6,7 @@ import dataaccess.DatabaseMemory;
 import datamodel.http.FailureResponse;
 import datamodel.http.InvalidRequestException;
 import handler.DataHandler;
+import handler.GameHandler;
 import handler.UserHandler;
 import io.javalin.Javalin;
 import io.javalin.http.ExceptionHandler;
@@ -25,6 +26,9 @@ public class Server {
         javalin.post("/user", userHandler::register);
         javalin.post("/session", userHandler::login);
         javalin.delete("/session", userHandler::logout);
+
+        var gameHandler = new GameHandler(db);
+        javalin.post("/game", gameHandler::createGame);
 
         var dataHandler = new DataHandler(db);
         javalin.delete("/db", dataHandler::clearDb);
