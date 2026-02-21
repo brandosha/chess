@@ -1,5 +1,6 @@
 package dataaccess;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import datamodel.GameData;
@@ -22,6 +23,11 @@ public class GameDaoMemory implements GameDao {
   @Override
   public GameData getGame(int id) {
     return games.get(id);
+  }
+
+  @Override
+  public Collection<GameData> listGames() {
+    return games.values();
   }
 
   @Override

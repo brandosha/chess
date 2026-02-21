@@ -5,6 +5,7 @@ import datamodel.GameData;
 import datamodel.http.CreateGameRequest;
 import datamodel.http.CreateGameResponse;
 import datamodel.http.InvalidRequestException;
+import datamodel.http.ListGamesResponse;
 
 public class GameService extends BaseService {
 
@@ -23,5 +24,12 @@ public class GameService extends BaseService {
     dao.insertGame(newGame);
 
     return new CreateGameResponse(newId);
+  }
+
+  public ListGamesResponse listGames(String authToken) throws UnauthorizedException {
+    checkAuth(authToken);
+    var dao = db.gameDao();
+    var games = dao.listGames();
+    return new ListGamesResponse(games);
   }
 }

@@ -19,4 +19,10 @@ public class GameHandler extends BaseHandler {
     var res = service.createGame(req, authToken);
     ctx.result(gson.toJson(res));
   }
+
+  public void listGames(Context ctx) throws Exception {
+    var authToken = ctx.header("Authorization");
+    var res = service.listGames(authToken);
+    ctx.result(gson.toJson(res));
+  }
 }
