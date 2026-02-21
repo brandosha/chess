@@ -30,6 +30,7 @@ public class Server {
         var gameHandler = new GameHandler(db);
         javalin.post("/game", gameHandler::createGame);
         javalin.get("/game", gameHandler::listGames);
+        javalin.put("/game", gameHandler::joinGame);
 
         var dataHandler = new DataHandler(db);
         javalin.delete("/db", dataHandler::clearDb);
