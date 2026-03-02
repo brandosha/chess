@@ -28,12 +28,12 @@ public class UserServiceTests {
     var res = service.register(req);
 
     var user = db.userDao().getUser(req.username);
-    assertEquals(user.username, req.username);
-    assertEquals(user.email, req.email);
-    assertEquals(user.password, req.password);
+    assertEquals(req.username, user.username);
+    assertEquals(req.email, user.email);
+    assertEquals(req.password, user.password);
 
     var auth = db.userDao().getAuth(res.authToken);
-    assertEquals(auth.username, req.username);
+    assertEquals(req.username, auth.username);
   }
 
   @Test
@@ -58,5 +58,19 @@ public class UserServiceTests {
     var loginReq = new LoginRequest("no-exist", "");
 
     assertThrows(UnauthorizedException.class, () -> service.login(loginReq));
+  }
+
+  @Test
+  public void logoutPositive() throws Exception {
+    var res = service.register(defaultUser);
+    service.logout(res.authToken);
+
+    var auth = db.userDao().getAuthUser(res.authToken);
+    assertEquals(null, auth);
+  }
+
+  @Test
+  public void logoutNegative() throws Exception {
+    assertThrows(UnauthorizedException.class, () -> service.logout("fake-auth-token"));
   }
 }
