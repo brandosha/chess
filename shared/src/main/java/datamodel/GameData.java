@@ -16,7 +16,7 @@ public class GameData {
     this.gameName = gameName;
     this.game = game;
   }
-  
+
 
   @Override
   public int hashCode() {
@@ -32,35 +32,23 @@ public class GameData {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
+    if (this == obj) { return true; }
+    if (obj == null) { return false; }
+    if (getClass() != obj.getClass()) { return false; }
     GameData other = (GameData) obj;
-    if (gameID != other.gameID)
-      return false;
+    if (gameID != other.gameID) { return false; }
     if (whiteUsername == null) {
-      if (other.whiteUsername != null)
-        return false;
-    } else if (!whiteUsername.equals(other.whiteUsername))
-      return false;
+      if (other.whiteUsername != null) { return false; }
+    } else if (!whiteUsername.equals(other.whiteUsername)) { return false; }
     if (blackUsername == null) {
-      if (other.blackUsername != null)
-        return false;
-    } else if (!blackUsername.equals(other.blackUsername))
-      return false;
+      if (other.blackUsername != null) { return false; }
+    } else if (!blackUsername.equals(other.blackUsername)) { return false; }
     if (gameName == null) {
-      if (other.gameName != null)
-        return false;
-    } else if (!gameName.equals(other.gameName))
-      return false;
+      if (other.gameName != null) { return false; }
+    } else if (!gameName.equals(other.gameName)) { return false; }
     if (game == null) {
-      if (other.game != null)
-        return false;
-    } else if (!game.equals(other.game))
-      return false;
+      if (other.game != null) { return false; }
+    } else if (!game.equals(other.game)) { return false; }
     return true;
   }
 }

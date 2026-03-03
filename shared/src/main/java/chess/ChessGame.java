@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import chess.ChessBoard.Square;
@@ -357,6 +358,9 @@ public class ChessGame {
         int result = 1;
         result = prime * result + ((board == null) ? 0 : board.hashCode());
         result = prime * result + ((turn == null) ? 0 : turn.hashCode());
+        result = prime * result + Arrays.hashCode(canLeftCastle);
+        result = prime * result + Arrays.hashCode(canRightCastle);
+        result = prime * result + ((enPassantPos == null) ? 0 : enPassantPos.hashCode());
         return result;
     }
 
@@ -370,6 +374,11 @@ public class ChessGame {
             if (other.board != null) { return false; }
         } else if (!board.equals(other.board)) { return false; }
         if (turn != other.turn) { return false; }
+        if (!Arrays.equals(canLeftCastle, other.canLeftCastle)) { return false; }
+        if (!Arrays.equals(canRightCastle, other.canRightCastle)) { return false; }
+        if (enPassantPos == null) {
+            if (other.enPassantPos != null) { return false; }
+        } else if (!enPassantPos.equals(other.enPassantPos)) { return false; }
         return true;
     }
 }
