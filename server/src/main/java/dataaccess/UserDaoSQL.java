@@ -45,38 +45,65 @@ public class UserDaoSQL implements UserDao {
 
   @Override
   public void insertUser(UserData user) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'insertUser'");
+    var insert = "INSERT INTO " + usersTableName + " (username, password, email) VALUES (?, ?, ?)";
+
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var statement = conn.prepareStatement(insert)) {
+        statement.setString(1, user.username);
+        statement.setString(2, user.password);
+        statement.setString(3, user.email);
+        statement.executeUpdate();
+      }
+    } catch (Exception e) {
+      // TODO: Proper error handling
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
   public UserData getUser(String username) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getUser'");
+    var select = "SELECT username, password, email FROM " + usersTableName + " WHERE username = ?";
+
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var statement = conn.prepareStatement(select)) {
+        statement.setString(1, username);
+        var results = statement.executeQuery();
+        if (results.next()) {
+          return new UserData(
+            results.getString(1),
+            results.getString(2),
+            results.getString(3)
+          );
+        }
+      }
+    } catch (Exception e) {
+      System.err.println(e);
+    }
+
+    return null;
   }
 
   @Override
   public void insertAuth(AuthData auth) {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'insertAuth'");
   }
 
   @Override
   public AuthData getAuth(String authToken) {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getAuth'");
+    return null;
   }
 
   @Override
   public AuthData deleteAuth(String authToken) {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'deleteAuth'");
+    return null;
   }
 
   @Override
   public UserData getAuthUser(String authToken) {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getAuthUser'");
+    return null;
   }
 
 }

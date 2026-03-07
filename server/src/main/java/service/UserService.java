@@ -1,5 +1,7 @@
 package service;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import dataaccess.Database;
 import datamodel.AuthData;
 import datamodel.http.InvalidRequestException;
@@ -22,6 +24,7 @@ public class UserService extends BaseService {
       throw new AlreadyTakenException("Username already taken");
     } else {
       var newUser = req.userData();
+      newUser.password = BCrypt.hashpw(newUser.password, BCrypt.gensalt());
       dao.insertUser(newUser);
       var newAuth = AuthData.generate(newUser.username);
       dao.insertAuth(newAuth);
@@ -34,7 +37,7 @@ public class UserService extends BaseService {
     var dao = db.userDao();
 
     var user = dao.getUser(req.username);
-    if (user == null || !user.checkPassword(req.password)) {
+    if (user == null || !BCrypt.checkpw(req.password, user.password)) {
       throw new UnauthorizedException();
     }
 

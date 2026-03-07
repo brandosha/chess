@@ -26,31 +26,29 @@ public class GameDaoSQL implements GameDao {
   @Override
   public void clear() {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'clear'");
   }
 
   @Override
   public void insertGame(GameData game) {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'insertGame'");
   }
 
   @Override
   public GameData getGame(int id) {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getGame'");
+    return null;
   }
 
   @Override
   public Collection<GameData> listGames() {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'listGames'");
+    return null;
   }
 
   @Override
   public int nextGameId() {
     // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'nextGameId'");
+    return 0;
   }
   
 }
