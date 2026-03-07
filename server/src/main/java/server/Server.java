@@ -2,7 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 
-import dataaccess.DatabaseMemory;
+import dataaccess.DatabaseSQL;
 import datamodel.http.FailureResponse;
 import datamodel.http.InvalidRequestException;
 import handler.DataHandler;
@@ -20,7 +20,7 @@ public class Server {
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
-        var db = new DatabaseMemory();
+        var db = new DatabaseSQL();
         
         var userHandler = new UserHandler(db);
         javalin.post("/user", userHandler::register);
