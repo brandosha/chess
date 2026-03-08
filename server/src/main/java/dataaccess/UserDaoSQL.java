@@ -39,13 +39,23 @@ public class UserDaoSQL implements UserDao {
 
   @Override
   public void clear() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'clear'");
+    var deleteAuth = "DELETE FROM " + authTableName;
+    var deleteUsers = "DELETE FROM " + usersTableName;
+
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var statement = conn.createStatement()) {
+        statement.execute(deleteAuth);
+        statement.execute(deleteUsers);
+      }
+    } catch (Exception e) {
+      // TODO: Proper error handling
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
   public void insertUser(UserData user) {
-    var insert = "INSERT INTO " + usersTableName + " (username, password, email) VALUES (?, ?, ?)";
+    var insert = "INSERT INTO " + usersTableName + " (username, password, email) VALUES (?, ?, ?);";
 
     try (var conn = DatabaseManager.getConnection()) {
       try (var statement = conn.prepareStatement(insert)) {

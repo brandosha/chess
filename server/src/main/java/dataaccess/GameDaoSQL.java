@@ -25,7 +25,16 @@ public class GameDaoSQL implements GameDao {
 
   @Override
   public void clear() {
-    // TODO Auto-generated method stub
+    var delete = "DELETE FROM " + tableName;
+    
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var statement = conn.createStatement()) {
+        statement.executeUpdate(delete);
+      }
+    } catch (Exception e) {
+      // TODO: Proper error handling
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
