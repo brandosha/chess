@@ -95,24 +95,82 @@ public class UserDaoSQL implements UserDao {
 
   @Override
   public void insertAuth(AuthData auth) {
-    // TODO Auto-generated method stub
+    var insert = "INSERT INTO " + authTableName + " (token, username) VALUES (?, ?);";
+
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var statement = conn.prepareStatement(insert)) {
+        statement.setString(1, auth.authToken);
+        statement.setString(2, auth.username);
+        statement.executeUpdate();
+      }
+    } catch (Exception e) {
+      // TODO: Proper error handling
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
   public AuthData getAuth(String authToken) {
-    // TODO Auto-generated method stub
+    var select = "SELECT token, username FROM " + authTableName + " WHERE token = ?";
+
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var statement = conn.prepareStatement(select)) {
+        statement.setString(1, authToken);
+        var results = statement.executeQuery();
+        if (results.next()) {
+          return new AuthData(
+            results.getString(1),
+            results.getString(2)
+          );
+        }
+      }
+    } catch (Exception e) {
+      System.err.println(e);
+    }
+
     return null;
   }
 
   @Override
   public AuthData deleteAuth(String authToken) {
-    // TODO Auto-generated method stub
+    var delete = "DELETE FROM " + authTableName + " WHERE token = ?";
+
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var statement = conn.prepareStatement(delete)) {
+        statement.setString(1, authToken);
+        statement.executeUpdate();
+      }
+    } catch (Exception e) {
+      System.err.println(e);
+    }
+
     return null;
   }
 
   @Override
   public UserData getAuthUser(String authToken) {
-    // TODO Auto-generated method stub
+    var select = "SELECT u.username, u.password, u.email"
+      + "  FROM " + authTableName + " a"
+      + "  INNER JOIN " + usersTableName + " u ON"
+      + "    (u.username = u.username)"
+      + "  WHERE token = ?";
+
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var statement = conn.prepareStatement(select)) {
+        statement.setString(1, authToken);
+        var results = statement.executeQuery();
+        if (results.next()) {
+          return new UserData(
+            results.getString(1),
+            results.getString(2),
+            results.getString(3)
+          );
+        }
+      }
+    } catch (Exception e) {
+      System.err.println(e);
+    }
+
     return null;
   }
 
