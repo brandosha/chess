@@ -19,12 +19,11 @@ public class GameService extends BaseService {
     checkAuth(authToken);
 
     var dao = db.gameDao();
-    var newId = dao.nextGameId();
-    var newGame = new GameData(newId, null, null, req.gameName, null);
+    var newGame = dao.createGame(
+      new GameData(null, null, null, req.gameName, null)
+    );
 
-    dao.insertGame(newGame);
-
-    return new CreateGameResponse(newId);
+    return new CreateGameResponse(newGame.gameID);
   }
 
   public ListGamesResponse listGames(String authToken) throws UnauthorizedException {
@@ -47,6 +46,6 @@ public class GameService extends BaseService {
       if (game.whiteUsername != null) { throw new AlreadyTakenException("already taken"); }
       game.whiteUsername = auth.username;
     }
-    dao.insertGame(game);
+    dao.updateGame(game);
   }
 }

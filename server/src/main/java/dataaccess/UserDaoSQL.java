@@ -87,7 +87,8 @@ public class UserDaoSQL implements UserDao {
         }
       }
     } catch (Exception e) {
-      System.err.println(e);
+      // TODO: Proper error handling
+      throw new RuntimeException(e);
     }
 
     return null;
@@ -125,7 +126,8 @@ public class UserDaoSQL implements UserDao {
         }
       }
     } catch (Exception e) {
-      System.err.println(e);
+      // TODO: Proper error handling
+      throw new RuntimeException(e);
     }
 
     return null;
@@ -141,7 +143,8 @@ public class UserDaoSQL implements UserDao {
         statement.executeUpdate();
       }
     } catch (Exception e) {
-      System.err.println(e);
+      // TODO: Proper error handling
+      throw new RuntimeException(e);
     }
 
     return null;
@@ -168,7 +171,8 @@ public class UserDaoSQL implements UserDao {
         }
       }
     } catch (Exception e) {
-      System.err.println(e);
+      // TODO: Proper error handling
+      throw new RuntimeException(e);
     }
 
     return null;

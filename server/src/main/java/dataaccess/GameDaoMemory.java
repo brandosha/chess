@@ -7,17 +7,21 @@ import datamodel.GameData;
 
 public class GameDaoMemory implements GameDao {
   private final HashMap<Integer, GameData> games = new HashMap<>();
-  private Integer nextKey = 0;
 
   @Override
-  public int nextGameId() {
-    nextKey += 1;
-    return nextKey;
+  public GameData createGame(GameData game) {
+    assert game.gameID == null : "GameData passed to createGame must have a null gameID";
+
+    var nextId = games.size();
+    games.put(nextId, game);
+
+    game.gameID = nextId;
+    return game;
   }
 
   @Override
-  public void insertGame(GameData game) {
-    games.put(game.gameID, game);
+  public GameData updateGame(GameData game) {
+    return games.put(game.gameID, game);
   }
 
   @Override

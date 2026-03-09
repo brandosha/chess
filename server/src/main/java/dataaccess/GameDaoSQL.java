@@ -1,5 +1,6 @@
 package dataaccess;
 
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -47,28 +48,67 @@ public class GameDaoSQL implements GameDao {
   }
 
   @Override
-  public void insertGame(GameData game) {
+  public GameData createGame(GameData game) {
+    assert game.gameID == null : "GameData passed to createGame must have a null gameID";
+
     var insert = "INSERT INTO " + tableName
       + "  (name, whiteUsername, blackUsername, gameState)"
       + "  VALUES (?, ?, ?, ?);";
 
     try (var conn = DatabaseManager.getConnection()) {
-      try (var statement = conn.prepareStatement(insert)) {
+      try (var statement = conn.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS)) {
         statement.setString(1, game.gameName);
         statement.setString(2, game.whiteUsername);
         statement.setString(3, game.blackUsername);
         statement.setString(4, gson.toJson(game.game));
         statement.executeUpdate();
+
+        var rkeys = statement.getGeneratedKeys();
+        if (rkeys.next()) {
+          game.gameID = rkeys.getInt(1);
+          return game;
+        }
       }
     } catch (Exception e) {
       // TODO: Proper error handling
       throw new RuntimeException(e);
     }
+
+    return null;
+  }
+
+  @Override
+  public GameData updateGame(GameData game) {
+    var update = "UPDATE " + tableName + " SET "
+      + "  name = ?, whiteUsername = ?, blackUsername = ?, gameState = ?"
+      + "  WHERE id = ?";
+    
+    try (var conn = DatabaseManager.getConnection()) {
+      try (var statement = conn.prepareStatement(update)) {
+        statement.setString(1, game.gameName);
+        statement.setString(2, game.whiteUsername);
+        statement.setString(3, game.blackUsername);
+        statement.setString(4, gson.toJson(game.game));
+        statement.setInt(5, game.gameID);
+        var rowsUpdated = statement.executeUpdate();
+
+        if (rowsUpdated == 1) {
+          return game;
+        } else if (rowsUpdated > 1) {
+          throw new RuntimeException("Update statement updated more than one row");
+        }
+      }
+    } catch (Exception e) {
+      // TODO: Proper error handling
+      throw new RuntimeException(e);
+    }
+
+    return null;
   }
 
   @Override
   public GameData getGame(int id) {
-    var select = "SELECT id, name, whiteUsername, blackUsername, gameState FROM " + tableName
+    var select = "SELECT id, whiteUsername, blackUsername, name, gameState FROM " + tableName
       + "  WHERE id = ?";
 
     try (var conn = DatabaseManager.getConnection()) {
@@ -95,7 +135,7 @@ public class GameDaoSQL implements GameDao {
 
   @Override
   public Collection<GameData> listGames() {
-    var select = "SELECT id, name, whiteUsername, blackUsername, gameState FROM " + tableName;
+    var select = "SELECT id, whiteUsername, blackUsername, name, gameState FROM " + tableName;
 
     var list = new ArrayList<GameData>();
     try (var conn = DatabaseManager.getConnection()) {
@@ -120,11 +160,4 @@ public class GameDaoSQL implements GameDao {
 
     return list;
   }
-
-  @Override
-  public int nextGameId() {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  
 }
