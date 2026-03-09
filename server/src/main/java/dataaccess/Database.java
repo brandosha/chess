@@ -1,8 +1,16 @@
 package dataaccess;
 
-public interface Database {
-  public UserDao userDao();
-  public GameDao gameDao();
+public abstract class Database {
+  public final UserDao userDao;
+  public final GameDao gameDao;
 
-  public void clear();
+  public Database(UserDao userDao, GameDao gameDao) {
+    this.userDao = userDao;
+    this.gameDao = gameDao;
+  }
+
+  public void clear() {
+    userDao.clear();
+    gameDao.clear();
+  }
 }

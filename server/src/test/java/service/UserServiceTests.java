@@ -27,12 +27,12 @@ public class UserServiceTests {
     var req = this.defaultUser;
     var res = service.register(req);
 
-    var user = db.userDao().getUser(req.username);
+    var user = db.userDao.getUser(req.username);
     assertEquals(req.username, user.username);
     assertEquals(req.email, user.email);
     assertEquals(req.password, user.password);
 
-    var auth = db.userDao().getAuth(res.authToken);
+    var auth = db.userDao.getAuth(res.authToken);
     assertEquals(req.username, auth.username);
   }
 
@@ -48,7 +48,7 @@ public class UserServiceTests {
     service.register(defaultUser);
 
     var res = service.login(new LoginRequest(defaultUser.username, defaultUser.password));
-    var auth = db.userDao().getAuth(res.authToken);
+    var auth = db.userDao.getAuth(res.authToken);
 
     assertEquals(auth.username, defaultUser.username);
   }
@@ -65,7 +65,7 @@ public class UserServiceTests {
     var res = service.register(defaultUser);
     service.logout(res.authToken);
 
-    var auth = db.userDao().getAuthUser(res.authToken);
+    var auth = db.userDao.getAuthUser(res.authToken);
     assertEquals(null, auth);
   }
 

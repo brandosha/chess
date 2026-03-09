@@ -17,7 +17,7 @@ public class UserService extends BaseService {
 
   public RegisterResponse register(RegisterRequest req) throws InvalidRequestException, AlreadyTakenException {
     req.validate();
-    var dao = db.userDao();
+    var dao = db.userDao;
 
     var existing = dao.getUser(req.username);
     if (existing != null) {
@@ -34,7 +34,7 @@ public class UserService extends BaseService {
 
   public LoginResponse login(LoginRequest req) throws InvalidRequestException, UnauthorizedException {
     req.validate();
-    var dao = db.userDao();
+    var dao = db.userDao;
 
     var user = dao.getUser(req.username);
     if (user == null || !BCrypt.checkpw(req.password, user.password)) {
@@ -48,8 +48,6 @@ public class UserService extends BaseService {
 
   public void logout(String authToken) throws UnauthorizedException {
     checkAuth(authToken);
-    
-    var dao = db.userDao();
-    dao.deleteAuth(authToken);
+    db.userDao.deleteAuth(authToken);
   }
 }

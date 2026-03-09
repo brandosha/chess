@@ -18,8 +18,7 @@ public class GameService extends BaseService {
     req.validate();
     checkAuth(authToken);
 
-    var dao = db.gameDao();
-    var newGame = dao.createGame(
+    var newGame = db.gameDao.createGame(
       new GameData(null, null, null, req.gameName, null)
     );
 
@@ -28,8 +27,7 @@ public class GameService extends BaseService {
 
   public ListGamesResponse listGames(String authToken) throws UnauthorizedException {
     checkAuth(authToken);
-    var dao = db.gameDao();
-    var games = dao.listGames();
+    var games = db.gameDao.listGames();
     return new ListGamesResponse(games);
   }
 
@@ -37,7 +35,7 @@ public class GameService extends BaseService {
     req.validate();
     var auth = checkAuth(authToken);
     
-    var dao = db.gameDao();
+    var dao = db.gameDao;
     var game = dao.getGame(req.gameID);
     if (req.playerColor.equals("BLACK")) {
       if (game.blackUsername != null) { throw new AlreadyTakenException("already taken"); }

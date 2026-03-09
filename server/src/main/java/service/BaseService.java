@@ -11,7 +11,7 @@ public abstract class BaseService {
   }
 
   public AuthData checkAuth(String authToken) throws UnauthorizedException {
-    var user = db.userDao().getAuth(authToken);
+    var user = db.userDao.getAuth(authToken);
     if (user == null) {
       throw new UnauthorizedException();
     }

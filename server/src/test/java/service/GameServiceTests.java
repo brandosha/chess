@@ -45,7 +45,7 @@ public class GameServiceTests {
     var req = new CreateGameRequest("new game");
     var res = service.createGame(req, authToken1);
 
-    var game = db.gameDao().getGame(res.gameID);
+    var game = db.gameDao.getGame(res.gameID);
     assertEquals(req.gameName, game.gameName);
   }
 
@@ -59,7 +59,7 @@ public class GameServiceTests {
   public void listGamesPositive() throws Exception {
     var req = new CreateGameRequest("new game");
     var createRes = service.createGame(req, authToken1);
-    var game = db.gameDao().getGame(createRes.gameID);
+    var game = db.gameDao.getGame(createRes.gameID);
 
     var list = service.listGames(authToken1);
     assertEquals(1, list.games.size());
@@ -79,7 +79,7 @@ public class GameServiceTests {
     var req = new JoinGameRequest("BLACK", createRes.gameID);
     service.joinGame(req, authToken1);
 
-    var game = db.gameDao().getGame(createRes.gameID);
+    var game = db.gameDao.getGame(createRes.gameID);
     assertEquals(defaultUser1.username, game.blackUsername);
   }
 

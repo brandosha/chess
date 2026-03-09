@@ -1,5 +1,7 @@
 package datamodel;
 
+import java.util.Objects;
+
 import chess.ChessGame;
 
 public class GameData {
@@ -36,7 +38,7 @@ public class GameData {
     if (obj == null) { return false; }
     if (getClass() != obj.getClass()) { return false; }
     GameData other = (GameData) obj;
-    if (gameID != other.gameID) { return false; }
+    if (!Objects.equals(gameID, other.gameID)) { return false; }
     if (whiteUsername == null) {
       if (other.whiteUsername != null) { return false; }
     } else if (!whiteUsername.equals(other.whiteUsername)) { return false; }

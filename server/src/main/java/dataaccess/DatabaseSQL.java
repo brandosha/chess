@@ -1,23 +1,11 @@
 package dataaccess;
 
-public class DatabaseSQL implements Database {
-  final UserDao userDao = new UserDaoSQL();
-  final GameDao gameDao = new GameDaoSQL();
+public class DatabaseSQL extends Database {
 
-  @Override
-  public UserDao userDao() {
-    return userDao;
+  public DatabaseSQL() {
+    super(
+      new UserDaoSQL(),
+      new GameDaoSQL()
+    );
   }
-
-  @Override
-  public GameDao gameDao() {
-    return gameDao;
-  }
-
-  @Override
-  public void clear() {
-    userDao.clear();
-    gameDao.clear();
-  }
-  
 }
