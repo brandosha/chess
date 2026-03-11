@@ -22,7 +22,7 @@ public class GameDaoSQL implements GameDao {
       + "  name VARCHAR(32) NOT NULL,"
       + "  whiteUsername VARCHAR(32),"
       + "  blackUsername VARCHAR(32),"
-      + "  gameState VARCHAR(512) NOT NULL"
+      + "  gameState VARCHAR(2048) NOT NULL"
       + ")";
     try (var conn = DatabaseManager.getConnection()) {
       try (var statement = conn.createStatement()) {

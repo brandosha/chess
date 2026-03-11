@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.Database;
 import datamodel.GameData;
 import datamodel.http.CreateGameRequest;
@@ -19,7 +20,7 @@ public class GameService extends BaseService {
     checkAuth(authToken);
 
     var newGame = db.gameDao.createGame(
-      new GameData(null, null, null, req.gameName, null)
+      new GameData(null, null, null, req.gameName, new ChessGame())
     );
 
     return new CreateGameResponse(newGame.gameID);
