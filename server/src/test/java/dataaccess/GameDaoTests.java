@@ -37,8 +37,11 @@ public class GameDaoTests {
     var chess = new ChessGame();
     var game = new GameData(null, null, null, "gname", chess);
     game = dao.createGame(game);
-
+    
+    game.whiteUsername = "wuser";
     dao.updateGame(game);
+
+    assertEquals(game, dao.getGame(game.gameID));
   }
 
   @Test
@@ -82,5 +85,8 @@ public class GameDaoTests {
   @Test
   public void testClear() throws DataAccessException {
     dao.clear();
+
+    var storedGames = dao.listGames();
+    assertEquals(0, storedGames.size());
   }
 }
