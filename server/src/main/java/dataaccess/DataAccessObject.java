@@ -1,5 +1,5 @@
 package dataaccess;
 
 public interface DataAccessObject {
-  public void clear();
+  public void clear() throws DataAccessException;
 }

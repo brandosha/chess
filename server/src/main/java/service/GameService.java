@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
 import dataaccess.Database;
 import datamodel.GameData;
 import datamodel.http.CreateGameRequest;
@@ -15,7 +16,7 @@ public class GameService extends BaseService {
     super(db);
   }
 
-  public CreateGameResponse createGame(CreateGameRequest req, String authToken) throws InvalidRequestException, UnauthorizedException {
+  public CreateGameResponse createGame(CreateGameRequest req, String authToken) throws InvalidRequestException, UnauthorizedException, DataAccessException {
     req.validate();
     checkAuth(authToken);
 
@@ -26,13 +27,13 @@ public class GameService extends BaseService {
     return new CreateGameResponse(newGame.gameID);
   }
 
-  public ListGamesResponse listGames(String authToken) throws UnauthorizedException {
+  public ListGamesResponse listGames(String authToken) throws UnauthorizedException, DataAccessException {
     checkAuth(authToken);
     var games = db.gameDao.listGames();
     return new ListGamesResponse(games);
   }
 
-  public void joinGame(JoinGameRequest req, String authToken) throws InvalidRequestException, UnauthorizedException, AlreadyTakenException {
+  public void joinGame(JoinGameRequest req, String authToken) throws InvalidRequestException, UnauthorizedException, DataAccessException, AlreadyTakenException {
     req.validate();
     var auth = checkAuth(authToken);
     

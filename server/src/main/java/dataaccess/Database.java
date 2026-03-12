@@ -9,7 +9,7 @@ public abstract class Database {
     this.gameDao = gameDao;
   }
 
-  public void clear() {
+  public void clear() throws DataAccessException {
     userDao.clear();
     gameDao.clear();
   }

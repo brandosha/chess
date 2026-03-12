@@ -1,5 +1,7 @@
 package dataaccess;
 
+import java.sql.SQLException;
+
 import datamodel.AuthData;
 import datamodel.UserData;
 
@@ -38,7 +40,7 @@ public class UserDaoSQL implements UserDao {
   }
 
   @Override
-  public void clear() {
+  public void clear() throws DataAccessException {
     var deleteAuth = "DELETE FROM " + authTableName;
     var deleteUsers = "DELETE FROM " + usersTableName;
 
@@ -47,14 +49,13 @@ public class UserDaoSQL implements UserDao {
         statement.execute(deleteAuth);
         statement.execute(deleteUsers);
       }
-    } catch (Exception e) {
-      // TODO: Proper error handling
-      throw new RuntimeException(e);
+    } catch (SQLException e) {
+      throw new DataAccessException(e);
     }
   }
 
   @Override
-  public void insertUser(UserData user) {
+  public void insertUser(UserData user) throws DataAccessException {
     var insert = "INSERT INTO " + usersTableName + " (username, password, email) VALUES (?, ?, ?);";
 
     try (var conn = DatabaseManager.getConnection()) {
@@ -65,13 +66,12 @@ public class UserDaoSQL implements UserDao {
         statement.executeUpdate();
       }
     } catch (Exception e) {
-      // TODO: Proper error handling
-      throw new RuntimeException(e);
+      throw new DataAccessException(e);
     }
   }
 
   @Override
-  public UserData getUser(String username) {
+  public UserData getUser(String username) throws DataAccessException {
     var select = "SELECT username, password, email FROM " + usersTableName + " WHERE username = ?";
 
     try (var conn = DatabaseManager.getConnection()) {
@@ -86,16 +86,15 @@ public class UserDaoSQL implements UserDao {
           );
         }
       }
-    } catch (Exception e) {
-      // TODO: Proper error handling
-      throw new RuntimeException(e);
+    } catch (SQLException e) {
+      throw new DataAccessException(e);
     }
 
     return null;
   }
 
   @Override
-  public void insertAuth(AuthData auth) {
+  public void insertAuth(AuthData auth) throws DataAccessException {
     var insert = "INSERT INTO " + authTableName + " (token, username) VALUES (?, ?);";
 
     try (var conn = DatabaseManager.getConnection()) {
@@ -104,14 +103,13 @@ public class UserDaoSQL implements UserDao {
         statement.setString(2, auth.username);
         statement.executeUpdate();
       }
-    } catch (Exception e) {
-      // TODO: Proper error handling
-      throw new RuntimeException(e);
+    } catch (SQLException e) {
+      throw new DataAccessException(e);
     }
   }
 
   @Override
-  public AuthData getAuth(String authToken) {
+  public AuthData getAuth(String authToken) throws DataAccessException {
     var select = "SELECT token, username FROM " + authTableName + " WHERE token = ?";
 
     try (var conn = DatabaseManager.getConnection()) {
@@ -125,16 +123,15 @@ public class UserDaoSQL implements UserDao {
           );
         }
       }
-    } catch (Exception e) {
-      // TODO: Proper error handling
-      throw new RuntimeException(e);
+    } catch (SQLException e) {
+      throw new DataAccessException(e);
     }
 
     return null;
   }
 
   @Override
-  public AuthData deleteAuth(String authToken) {
+  public AuthData deleteAuth(String authToken) throws DataAccessException {
     var delete = "DELETE FROM " + authTableName + " WHERE token = ?";
 
     try (var conn = DatabaseManager.getConnection()) {
@@ -142,16 +139,15 @@ public class UserDaoSQL implements UserDao {
         statement.setString(1, authToken);
         statement.executeUpdate();
       }
-    } catch (Exception e) {
-      // TODO: Proper error handling
-      throw new RuntimeException(e);
+    } catch (SQLException e) {
+      throw new DataAccessException(e);
     }
 
     return null;
   }
 
   @Override
-  public UserData getAuthUser(String authToken) {
+  public UserData getAuthUser(String authToken) throws DataAccessException {
     var select = "SELECT u.username, u.password, u.email"
       + "  FROM " + authTableName + " a"
       + "  INNER JOIN " + usersTableName + " u ON"
@@ -170,9 +166,8 @@ public class UserDaoSQL implements UserDao {
           );
         }
       }
-    } catch (Exception e) {
-      // TODO: Proper error handling
-      throw new RuntimeException(e);
+    } catch (SQLException e) {
+      throw new DataAccessException(e);
     }
 
     return null;

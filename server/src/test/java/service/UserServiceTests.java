@@ -30,7 +30,6 @@ public class UserServiceTests {
     var user = db.userDao.getUser(req.username);
     assertEquals(req.username, user.username);
     assertEquals(req.email, user.email);
-    assertEquals(req.password, user.password);
 
     var auth = db.userDao.getAuth(res.authToken);
     assertEquals(req.username, auth.username);

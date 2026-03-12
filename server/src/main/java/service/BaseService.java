@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.Database;
 import datamodel.AuthData;
 
@@ -10,7 +11,7 @@ public abstract class BaseService {
     this.db = db;
   }
 
-  public AuthData checkAuth(String authToken) throws UnauthorizedException {
+  public AuthData checkAuth(String authToken) throws UnauthorizedException, DataAccessException {
     var user = db.userDao.getAuth(authToken);
     if (user == null) {
       throw new UnauthorizedException();

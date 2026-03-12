@@ -2,6 +2,7 @@ package service;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import dataaccess.DataAccessException;
 import dataaccess.Database;
 import datamodel.AuthData;
 import datamodel.http.InvalidRequestException;
@@ -15,7 +16,7 @@ public class UserService extends BaseService {
     super(db);
   }
 
-  public RegisterResponse register(RegisterRequest req) throws InvalidRequestException, AlreadyTakenException {
+  public RegisterResponse register(RegisterRequest req) throws InvalidRequestException, DataAccessException, AlreadyTakenException {
     req.validate();
     var dao = db.userDao;
 
@@ -32,7 +33,7 @@ public class UserService extends BaseService {
     }
   }
 
-  public LoginResponse login(LoginRequest req) throws InvalidRequestException, UnauthorizedException {
+  public LoginResponse login(LoginRequest req) throws InvalidRequestException, DataAccessException, UnauthorizedException {
     req.validate();
     var dao = db.userDao;
 
@@ -46,7 +47,7 @@ public class UserService extends BaseService {
     return new LoginResponse(authData);
   }
 
-  public void logout(String authToken) throws UnauthorizedException {
+  public void logout(String authToken) throws UnauthorizedException, DataAccessException {
     checkAuth(authToken);
     db.userDao.deleteAuth(authToken);
   }

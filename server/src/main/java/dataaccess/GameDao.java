@@ -5,8 +5,8 @@ import java.util.Collection;
 import datamodel.GameData;
 
 public interface GameDao extends DataAccessObject {
-  public GameData createGame(GameData game);
-  public GameData updateGame(GameData game);
-  public GameData getGame(int id);
-  public Collection<GameData> listGames();
+  public GameData createGame(GameData game) throws DataAccessException;
+  public GameData updateGame(GameData game) throws DataAccessException;
+  public GameData getGame(int id) throws DataAccessException;
+  public Collection<GameData> listGames() throws DataAccessException;
 }

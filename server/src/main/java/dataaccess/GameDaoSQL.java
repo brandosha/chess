@@ -1,5 +1,6 @@
 package dataaccess;
 
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +35,7 @@ public class GameDaoSQL implements GameDao {
   }
 
   @Override
-  public void clear() {
+  public void clear() throws DataAccessException {
     var delete = "DELETE FROM " + tableName;
     
     try (var conn = DatabaseManager.getConnection()) {
@@ -42,14 +43,15 @@ public class GameDaoSQL implements GameDao {
         statement.executeUpdate(delete);
       }
     } catch (Exception e) {
-      // TODO: Proper error handling
       throw new RuntimeException(e);
     }
   }
 
   @Override
-  public GameData createGame(GameData game) {
-    assert game.gameID == null : "GameData passed to createGame must have a null gameID";
+  public GameData createGame(GameData game) throws DataAccessException {
+    if (game.gameID != null) {
+      throw new DataAccessException("GameData passed to createGame must have a null gameID");
+    }
 
     var insert = "INSERT INTO " + tableName
       + "  (name, whiteUsername, blackUsername, gameState)"
@@ -69,16 +71,19 @@ public class GameDaoSQL implements GameDao {
           return game;
         }
       }
-    } catch (Exception e) {
-      // TODO: Proper error handling
-      throw new RuntimeException(e);
+    } catch (SQLException e) {
+      throw new DataAccessException(e);
     }
 
     return null;
   }
 
   @Override
-  public GameData updateGame(GameData game) {
+  public GameData updateGame(GameData game) throws DataAccessException {
+    if (game.gameID == null) {
+      throw new DataAccessException("game passed to updateGame must have non-null gameID");
+    }
+
     var update = "UPDATE " + tableName + " SET "
       + "  name = ?, whiteUsername = ?, blackUsername = ?, gameState = ?"
       + "  WHERE id = ?";
@@ -96,18 +101,17 @@ public class GameDaoSQL implements GameDao {
           return game;
         } else if (rowsUpdated > 1) {
           throw new RuntimeException("Update statement updated more than one row");
+        } else {
+          throw new DataAccessException("No game to update with id " + game.gameID);
         }
       }
-    } catch (Exception e) {
-      // TODO: Proper error handling
-      throw new RuntimeException(e);
+    } catch (SQLException e) {
+      throw new DataAccessException(e);
     }
-
-    return null;
   }
 
   @Override
-  public GameData getGame(int id) {
+  public GameData getGame(int id) throws DataAccessException {
     var select = "SELECT id, whiteUsername, blackUsername, name, gameState FROM " + tableName
       + "  WHERE id = ?";
 
@@ -126,15 +130,15 @@ public class GameDaoSQL implements GameDao {
           );
         }
       }
-    } catch (Exception e) {
-      System.err.println(e);
+    } catch (SQLException e) {
+      throw new DataAccessException(e);
     }
 
     return null;
   }
 
   @Override
-  public Collection<GameData> listGames() {
+  public Collection<GameData> listGames() throws DataAccessException {
     var select = "SELECT id, whiteUsername, blackUsername, name, gameState FROM " + tableName;
 
     var list = new ArrayList<GameData>();
@@ -154,8 +158,8 @@ public class GameDaoSQL implements GameDao {
           list.add(data);
         }
       }
-    } catch (Exception e) {
-      System.err.println(e);
+    } catch (SQLException e) {
+      throw new DataAccessException(e);
     }
 
     return list;
