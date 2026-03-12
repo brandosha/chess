@@ -30,8 +30,8 @@ public class UserDaoMemory implements UserDao {
   }
 
   @Override
-  public AuthData deleteAuth(String authToken) {
-    return authTokens.remove(authToken);
+  public void deleteAuth(String authToken) {
+    authTokens.remove(authToken);
   }
 
   @Override

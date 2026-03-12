@@ -131,7 +131,7 @@ public class UserDaoSQL implements UserDao {
   }
 
   @Override
-  public AuthData deleteAuth(String authToken) throws DataAccessException {
+  public void deleteAuth(String authToken) throws DataAccessException {
     var delete = "DELETE FROM " + authTableName + " WHERE token = ?";
 
     try (var conn = DatabaseManager.getConnection()) {
@@ -142,8 +142,6 @@ public class UserDaoSQL implements UserDao {
     } catch (SQLException e) {
       throw new DataAccessException(e);
     }
-
-    return null;
   }
 
   @Override

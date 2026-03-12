@@ -71,6 +71,64 @@ public class UserDaoTests {
   }
 
   @Test
+  public void getAuthPositive() throws DataAccessException {
+    dao.clear();
+
+    var user = new UserData("gusername", "gpw", "gemail");
+    dao.insertUser(user);
+    var auth = AuthData.generate(user.username);
+    dao.insertAuth(auth);
+
+    assertEquals(auth, dao.getAuth(auth.authToken));
+  }
+
+  @Test
+  public void getAuthNegative() throws DataAccessException {
+    dao.clear();
+
+    assertEquals(null, dao.getAuth("no-exist"));
+  }
+
+  @Test
+  public void deleteAuthPositive() throws DataAccessException {
+    dao.clear();
+
+    var user = new UserData("gusername", "gpw", "gemail");
+    dao.insertUser(user);
+    var auth = AuthData.generate(user.username);
+    dao.insertAuth(auth);
+
+    assertEquals(auth, dao.getAuth(auth.authToken));
+
+    dao.deleteAuth(auth.authToken);
+    assertEquals(null, dao.getAuth(auth.authToken));
+  }
+
+  @Test
+  public void getAuthUserPositive() throws DataAccessException {
+    dao.clear();
+
+    var user = new UserData("gusername", "gpw", "gemail");
+    dao.insertUser(user);
+    var auth = AuthData.generate(user.username);
+    dao.insertAuth(auth);
+
+    assertEquals(user, dao.getAuthUser(auth.authToken));
+  }
+
+  @Test
+  public void getAuthUserNegative() throws DataAccessException {
+    dao.clear();
+
+    var user = new UserData("gusername", "gpw", "gemail");
+    dao.insertUser(user);
+    var auth = AuthData.generate(user.username);
+    // dao.insertAuth(auth);
+
+    assertEquals(null, dao.getAuthUser(auth.authToken));
+  }
+
+  @Test
   public void clear() throws DataAccessException {
     dao.clear();
 
