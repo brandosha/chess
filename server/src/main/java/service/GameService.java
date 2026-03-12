@@ -16,7 +16,8 @@ public class GameService extends BaseService {
     super(db);
   }
 
-  public CreateGameResponse createGame(CreateGameRequest req, String authToken) throws InvalidRequestException, UnauthorizedException, DataAccessException {
+  public CreateGameResponse createGame(CreateGameRequest req, String authToken)
+  throws InvalidRequestException, UnauthorizedException, DataAccessException {
     req.validate();
     checkAuth(authToken);
 
@@ -33,7 +34,8 @@ public class GameService extends BaseService {
     return new ListGamesResponse(games);
   }
 
-  public void joinGame(JoinGameRequest req, String authToken) throws InvalidRequestException, UnauthorizedException, DataAccessException, AlreadyTakenException {
+  public void joinGame(JoinGameRequest req, String authToken)
+  throws InvalidRequestException, UnauthorizedException, DataAccessException, AlreadyTakenException {
     req.validate();
     var auth = checkAuth(authToken);
     
