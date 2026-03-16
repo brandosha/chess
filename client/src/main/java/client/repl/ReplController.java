@@ -8,18 +8,24 @@ public class ReplController {
   private final Console console = System.console();
 
   public void start(ReplView startView) {
-    if (console == null) {
+    if (console == null || !console.isTerminal()) {
       throw new RuntimeException("REPL can only by run in a command line environment");
     }
 
     this.push(startView);
 
+    ReplView view = null;
     while (!stack.isEmpty()) {
-      var view = this.stack.getLast();
-      if (view.closed) {
+      var topView = this.stack.getLast();
+      if (topView != view) {
+        view = topView;
+        view.onAppear();
+      }
+
+      if (view == null || view.closed) {
         this.stack.removeLast();
       } else {
-        view.rep(console);
+        view.rep();
       }
     }
   }
@@ -27,5 +33,6 @@ public class ReplController {
   public void push(ReplView view) {
     this.stack.add(view);
     view.controller = this;
+    view.console = console;
   }
 }

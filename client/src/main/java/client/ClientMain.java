@@ -3,7 +3,7 @@ package client;
 import chess.ChessGame;
 import chess.ChessPiece;
 import client.repl.ReplController;
-import client.views.PregameView;
+import client.views.PreloginView;
 
 public class ClientMain {
     public static void main(String[] args) {
@@ -11,6 +11,6 @@ public class ClientMain {
         System.out.println("♕ 240 Chess Client: " + piece);
 
         var repl = new ReplController();
-        repl.start(new PregameView());
+        repl.start(new PreloginView());
     }
 }
