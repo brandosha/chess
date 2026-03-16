@@ -6,16 +6,18 @@ import java.util.ArrayList;
 public class ReplController {
   private final ArrayList<ReplView> stack = new ArrayList<>();
   private final Console console = System.console();
+  private boolean stopped = false;
 
   public void start(ReplView startView) {
     if (console == null || !console.isTerminal()) {
       throw new RuntimeException("REPL can only by run in a command line environment");
     }
 
+    this.stopped = false;
     this.push(startView);
 
     ReplView view = null;
-    while (!stack.isEmpty()) {
+    while (!stopped && !stack.isEmpty()) {
       var topView = this.stack.getLast();
       if (topView != view) {
         view = topView;
@@ -34,5 +36,9 @@ public class ReplController {
     this.stack.add(view);
     view.controller = this;
     view.console = console;
+  }
+
+  public void stop() {
+    this.stopped = true;
   }
 }
