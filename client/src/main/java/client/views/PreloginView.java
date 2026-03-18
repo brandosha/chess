@@ -1,6 +1,11 @@
 package client.views;
 
+import java.io.IOException;
+
 import client.repl.ReplView;
+import client.server.ServerFacade;
+import client.server.ServerResponseException;
+import datamodel.http.RegisterRequest;
 
 public class PreloginView extends ReplView {
 
@@ -30,6 +35,14 @@ public class PreloginView extends ReplView {
   public void register(String[] argv) {
     var password = new String(console.readPassword("Password: "));
     console.printf("Registering with %s => %s\n", argv[1], password);
+
+    try {
+      var request = new RegisterRequest(argv[1], password, "");
+      var response = ServerFacade.local.register(request);
+      System.out.println(response);
+    } catch (ServerResponseException | IOException | InterruptedException e) {
+      console.printf("Registration failed: %s", e.getMessage());
+    }
   }
 
   public void login(String[] argv) {
