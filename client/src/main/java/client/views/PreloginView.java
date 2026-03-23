@@ -5,6 +5,7 @@ import java.io.IOException;
 import client.repl.ReplView;
 import client.server.ServerFacade;
 import client.server.ServerResponseException;
+import datamodel.http.LoginRequest;
 import datamodel.http.RegisterRequest;
 
 public class PreloginView extends ReplView {
@@ -33,13 +34,17 @@ public class PreloginView extends ReplView {
   }
 
   public void register(String[] argv) {
+    if (argv.length != 2) {
+      console.printf("Usage: [r]egister <username>\n");
+      return;
+    }
+
     var password = new String(console.readPassword("Password: "));
-    console.printf("Registering with %s => %s\n", argv[1], password);
 
     try {
       var request = new RegisterRequest(argv[1], password, "");
       var response = ServerFacade.local.register(request);
-      System.out.println(response);
+      
       controller.push(new PostloginView(response.authToken));
     } catch (ServerResponseException | IOException | InterruptedException e) {
       console.printf("Registration failed: %s\n", e.getMessage());
@@ -47,8 +52,20 @@ public class PreloginView extends ReplView {
   }
 
   public void login(String[] argv) {
+    if (argv.length != 2) {
+      console.printf("Usage: [l]ogin <username>\n");
+      return;
+    }
+
     var password = new String(console.readPassword("Password: "));
-    console.printf("Logging in with %s => %s\n", argv[1], password);
+    try {
+      var request = new LoginRequest(argv[1], password);
+      var response = ServerFacade.local.login(request);
+      
+      controller.push(new PostloginView(response.authToken));
+    } catch (ServerResponseException | IOException | InterruptedException e) {
+      console.printf("Registration failed: %s\n", e.getMessage());
+    }
   }
 
   public void help() {

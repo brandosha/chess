@@ -10,6 +10,8 @@ import java.net.http.HttpResponse;
 
 import com.google.gson.Gson;
 
+import datamodel.http.LoginRequest;
+import datamodel.http.LoginResponse;
 import datamodel.http.RegisterRequest;
 import datamodel.http.RegisterResponse;
 
@@ -38,6 +40,19 @@ public class ServerFacade {
     var res = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
     if (res.statusCode() == 200) {
       return gson.fromJson(res.body(), RegisterResponse.class);
+    } else {
+      throw ServerResponseException.fromResponse(res);
+    }
+  }
+
+  public LoginResponse login(LoginRequest loginRequest) throws ServerResponseException, IOException, InterruptedException {
+    var uri = this.uri("/session");
+    var body = gson.toJson(loginRequest);
+    var req = HttpRequest.newBuilder(uri).POST(HttpRequest.BodyPublishers.ofString(body)).build();
+
+    var res = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+    if (res.statusCode() == 200) {
+      return gson.fromJson(res.body(), LoginResponse.class);
     } else {
       throw ServerResponseException.fromResponse(res);
     }
