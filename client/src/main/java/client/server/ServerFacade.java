@@ -58,6 +58,16 @@ public class ServerFacade {
     }
   }
 
+  public void logout() throws ServerResponseException, IOException, InterruptedException {
+    var uri = this.uri("/session");
+    var req = HttpRequest.newBuilder(uri).DELETE().build();
+
+    var res = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+    if (res.statusCode() != 200) {
+      throw ServerResponseException.fromResponse(res);
+    }
+  }
+
   private URI uri(String path) {
     try {
       return new URI("http", "", hostname, port, path, "", "");

@@ -64,7 +64,7 @@ public class PreloginView extends ReplView {
       
       controller.push(new PostloginView(response.authToken));
     } catch (ServerResponseException | IOException | InterruptedException e) {
-      console.printf("Registration failed: %s\n", e.getMessage());
+      console.printf("Login failed: %s\n", e.getMessage());
     }
   }
 
