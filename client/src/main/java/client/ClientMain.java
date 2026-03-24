@@ -3,6 +3,7 @@ package client;
 import chess.ChessGame;
 import chess.ChessPiece;
 import client.repl.ReplController;
+import client.server.ServerFacade;
 import client.views.PreloginView;
 
 public class ClientMain {
@@ -11,6 +12,7 @@ public class ClientMain {
         System.out.println("♕ 240 Chess Client: " + piece);
 
         var repl = new ReplController();
-        repl.start(new PreloginView());
+        var serverFacade = new ServerFacade("localhost", 8080);
+        repl.start(new PreloginView(serverFacade));
     }
 }

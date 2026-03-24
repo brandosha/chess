@@ -24,12 +24,11 @@ public class PlayGameView extends ReplView {
 
   @Override
   public void rep() {
-    var cmd = console.readLine("> ");
-    if (cmd == null) {
+    var argv = readCmd("> ");
+    if (argv == null) {
       controller.stop();
       return;
     }
-    var argv = cmd.split("\\s+");
 
     switch (argv[0]) {
       case "d", "draw" -> draw();

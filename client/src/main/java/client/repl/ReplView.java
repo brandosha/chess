@@ -16,4 +16,13 @@ abstract public class ReplView {
   public void close() {
     this.closed = true;
   }
+
+  public String[] readCmd(String prompt) {
+    var cmd = console.readLine(prompt);
+    if (cmd == null) {
+      return null;
+    }
+
+    return cmd.split("\\s+");
+  }
 }

@@ -10,6 +10,12 @@ import datamodel.http.RegisterRequest;
 
 public class PreloginView extends ReplView {
 
+  private final ServerFacade serverFacade;
+
+  public PreloginView(ServerFacade serverFacade) {
+    this.serverFacade = serverFacade;
+  }
+
   @Override
   public void onAppear() {
     help();
@@ -17,19 +23,18 @@ public class PreloginView extends ReplView {
 
   @Override
   public void rep() {
-    var cmd = console.readLine("> ");
-    if (cmd == null) {
+    var argv = readCmd("> ");
+    if (argv == null) {
       controller.stop();
       return;
     }
-    var argv = cmd.split("\\s+");
 
     switch (argv[0]) {
       case "r", "register" -> register(argv);
       case "l", "login" -> login(argv);
       case "h", "help" -> help();
       case "q", "quit" -> controller.stop();
-      default -> console.printf("Unknown command \"%s\"\n", cmd);
+      default -> console.printf("Unknown command \"%s\"\n", argv[0]);
     }
   }
 
@@ -43,9 +48,9 @@ public class PreloginView extends ReplView {
 
     try {
       var request = new RegisterRequest(argv[1], password, "");
-      var response = ServerFacade.local.register(request);
+      var response = serverFacade.register(request);
       
-      controller.push(new PostloginView(response.authToken, response.username));
+      controller.push(new PostloginView(serverFacade, response.authToken, response.username));
     } catch (ServerResponseException | IOException | InterruptedException e) {
       console.printf("Registration failed: %s\n", e.getMessage());
     }
@@ -60,9 +65,9 @@ public class PreloginView extends ReplView {
     var password = new String(console.readPassword("Password: "));
     try {
       var request = new LoginRequest(argv[1], password);
-      var response = ServerFacade.local.login(request);
+      var response = serverFacade.login(request);
       
-      controller.push(new PostloginView(response.authToken, response.username));
+      controller.push(new PostloginView(serverFacade, response.authToken, response.username));
     } catch (ServerResponseException | IOException | InterruptedException e) {
       console.printf("Login failed: %s\n", e.getMessage());
     }

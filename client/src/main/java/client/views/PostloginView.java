@@ -14,11 +14,13 @@ import datamodel.http.JoinGameRequest;
 
 public class PostloginView extends ReplView {
 
+  private final ServerFacade serverFacade;
   private final String authToken;
   private final String username;
-  private HashMap<Integer, GameData> games = new HashMap<>();
+  private final HashMap<Integer, GameData> games = new HashMap<>();
 
-  public PostloginView(String authToken, String username) {
+  public PostloginView(ServerFacade serverFacade, String authToken, String username) {
+    this.serverFacade = serverFacade;
     this.authToken = authToken;
     this.username = username;
   }
@@ -30,12 +32,11 @@ public class PostloginView extends ReplView {
 
   @Override
   public void rep() {
-    var cmd = console.readLine("> ");
-    if (cmd == null) {
+    var argv = readCmd("> ");
+    if (argv == null) {
       controller.stop();
       return;
     }
-    var argv = cmd.split("\\s+");
 
     switch (argv[0]) {
       case "c", "create" -> create(argv);
@@ -51,7 +52,7 @@ public class PostloginView extends ReplView {
 
   public void logout() {
     try {
-      ServerFacade.local.logout(authToken);
+      serverFacade.logout(authToken);
       close();
     } catch (IOException | InterruptedException e) {
       console.printf("Logout failed: %s\n", e.getMessage());
@@ -71,7 +72,7 @@ public class PostloginView extends ReplView {
     
     try {
       var request = new CreateGameRequest(args[1]);
-      var response = ServerFacade.local.createGame(request, authToken);
+      var response = serverFacade.createGame(request, authToken);
       console.printf("Game created\n  %d. %s\n", response.gameID, args[1]);
     } catch (IOException | InterruptedException e) {
       console.printf("Failed to create game: %s\n", e.getMessage());
@@ -87,7 +88,7 @@ public class PostloginView extends ReplView {
 
   public void show() {
     try {
-      var response = ServerFacade.local.listGames(authToken);
+      var response = serverFacade.listGames(authToken);
 
       games.clear();
       for (GameData game : response.games) {
@@ -160,7 +161,7 @@ public class PostloginView extends ReplView {
 
     try {
       var request = new JoinGameRequest(color, game.gameID);
-      ServerFacade.local.joinGame(request, authToken);
+      serverFacade.joinGame(request, authToken);
       controller.push(new PlayGameView(authToken, game, team));
     } catch (IOException | InterruptedException e) {
       console.printf("Failed to join game: %s\n", e.getMessage());

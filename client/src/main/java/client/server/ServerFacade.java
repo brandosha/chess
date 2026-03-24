@@ -21,10 +21,10 @@ import datamodel.http.RegisterResponse;
 
 public class ServerFacade {
 
-  public static final ServerFacade local = new ServerFacade("localhost", 8080);
+  // public static final ServerFacade local = new ServerFacade("localhost", 8080);
   
-  private static final HttpClient httpClient = HttpClient.newHttpClient();
-  private static final Gson gson = new Gson();
+  private final HttpClient httpClient = HttpClient.newHttpClient();
+  private final Gson gson = new Gson();
 
   final String hostname;
   final int port;
@@ -34,7 +34,8 @@ public class ServerFacade {
     this.port = port;
   }
 
-  public RegisterResponse register(RegisterRequest registerRequest) throws ServerResponseException, IOException, InterruptedException {
+  public RegisterResponse register(RegisterRequest registerRequest)
+  throws ServerResponseException, IOException, InterruptedException {
     var uri = this.uri("/user");
     var body = gson.toJson(registerRequest);
     var req = HttpRequest.newBuilder(uri).POST(BodyPublishers.ofString(body)).build();
@@ -47,7 +48,8 @@ public class ServerFacade {
     }
   }
 
-  public LoginResponse login(LoginRequest loginRequest) throws ServerResponseException, IOException, InterruptedException {
+  public LoginResponse login(LoginRequest loginRequest)
+  throws ServerResponseException, IOException, InterruptedException {
     var uri = this.uri("/session");
     var body = gson.toJson(loginRequest);
     var req = HttpRequest.newBuilder(uri).POST(HttpRequest.BodyPublishers.ofString(body)).build();
@@ -60,7 +62,8 @@ public class ServerFacade {
     }
   }
 
-  public void logout(String authToken) throws ServerResponseException, IOException, InterruptedException {
+  public void logout(String authToken)
+  throws ServerResponseException, IOException, InterruptedException {
     var uri = this.uri("/session");
     var req = HttpRequest.newBuilder(uri).DELETE().header("Authorization", authToken).build();
 
@@ -70,7 +73,8 @@ public class ServerFacade {
     }
   }
 
-  public CreateGameResponse createGame(CreateGameRequest createRequest, String authToken) throws ServerResponseException, IOException, InterruptedException {
+  public CreateGameResponse createGame(CreateGameRequest createRequest, String authToken)
+  throws ServerResponseException, IOException, InterruptedException {
     var uri = this.uri("/game");
     var body = gson.toJson(createRequest);
     var req = HttpRequest.newBuilder(uri)
@@ -86,7 +90,8 @@ public class ServerFacade {
     }
   }
 
-  public ListGamesResponse listGames(String authToken) throws ServerResponseException, IOException, InterruptedException {
+  public ListGamesResponse listGames(String authToken)
+  throws ServerResponseException, IOException, InterruptedException {
     var uri = this.uri("/game");
     var req = HttpRequest.newBuilder(uri).GET().header("Authorization", authToken).build();
 
@@ -98,7 +103,8 @@ public class ServerFacade {
     }
   }
 
-  public void joinGame(JoinGameRequest joinRequest, String authToken) throws ServerResponseException, IOException, InterruptedException {
+  public void joinGame(JoinGameRequest joinRequest, String authToken)
+  throws ServerResponseException, IOException, InterruptedException {
     var uri = this.uri("/game");
     var body = gson.toJson(joinRequest);
     var req = HttpRequest.newBuilder(uri)
