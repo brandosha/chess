@@ -1,21 +1,26 @@
 package client.views;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import chess.ChessGame;
 import client.repl.ReplView;
 import client.server.ServerFacade;
 import client.server.ServerResponseException;
 import datamodel.GameData;
 import datamodel.http.CreateGameRequest;
+import datamodel.http.JoinGameRequest;
 
 public class PostloginView extends ReplView {
 
   private final String authToken;
+  private final String username;
   private HashMap<Integer, GameData> games = new HashMap<>();
 
-  public PostloginView(String authToken) {
+  public PostloginView(String authToken, String username) {
     this.authToken = authToken;
+    this.username = username;
   }
 
   @Override
@@ -35,6 +40,7 @@ public class PostloginView extends ReplView {
     switch (argv[0]) {
       case "c", "create" -> create(argv);
       case "s", "show" -> show();
+      case "j", "join" -> join(argv);
       case "o", "observe" -> observe(argv);
       case "l", "logout" -> logout();
       case "h", "help" -> help();
@@ -100,24 +106,82 @@ public class PostloginView extends ReplView {
     }
   }
 
+  public void join(String[] argv) {
+    if (argv.length != 2) {
+      console.printf("Usage: [j]oin <game id>\n");
+      return;
+    }
+
+    var game = getGame(argv[1]);
+    if (game == null) { return; }
+
+    ArrayList<String> availableColors = new ArrayList<>();
+
+    String players = "Players:\n";
+    if (game.blackUsername == null) {
+      players += "  Black: --\n";
+      availableColors.add("b");
+    } else if (game.blackUsername.equals(username)) {
+      controller.push(new PlayGameView(authToken, game, ChessGame.TeamColor.BLACK));
+      return;
+    } else {
+      players += "  Black: " + game.blackUsername + "\n";
+    }
+
+    if (game.whiteUsername == null) {
+      players += "  White: --";
+      availableColors.add("w");
+    } else if (game.whiteUsername.equals(username)) {
+      controller.push(new PlayGameView(authToken, game, ChessGame.TeamColor.WHITE));
+      return;
+    } else {
+      players += "  White: " + game.whiteUsername;
+    }
+
+    console.printf("%s\n", players);
+
+    var color = console.readLine("\nChoose your color (%s): ", String.join("/", availableColors));
+    if (!availableColors.contains(color)) {
+      console.printf("%s is not a valid option\n", color);
+      return;
+    }
+
+    ChessGame.TeamColor team = switch (color) {
+      case "b" -> ChessGame.TeamColor.BLACK;
+      case "w" -> ChessGame.TeamColor.WHITE;
+      default -> null;
+    };
+
+    color = switch (color) {
+      case "b" -> "BLACK";
+      case "w" -> "WHITE";
+      default -> null;
+    };
+
+    try {
+      var request = new JoinGameRequest(color, game.gameID);
+      ServerFacade.local.joinGame(request, authToken);
+      controller.push(new PlayGameView(authToken, game, team));
+    } catch (IOException | InterruptedException e) {
+      console.printf("Failed to join game: %s\n", e.getMessage());
+    } catch (ServerResponseException e) {
+      if (e.response.statusCode() == 401) {
+        console.printf("Session has ended, logging out.\n");
+        close();
+      } else {
+        console.printf("Failed to join game: %s\n", e.getMessage());
+      }
+    }
+  }
+
   public void observe(String[] argv) {
     if (argv.length != 2) {
       console.printf("Usage: [o]bserve <game id>\n");
       return;
     }
 
-    int id = -1;
-    try {
-      id = Integer.parseInt(argv[1]);
-    } catch (NumberFormatException e) {
-      console.printf("Invalid game id: %s is not a number\n", argv[1]);
-      return;
-    }
-
-    var game = games.get(id);
-    if (game == null) {
-      console.printf("No game with id %s. Use 'show' to see a list of all games\n", argv[1]);
-    } else {
+    var game = getGame(argv[1]);
+    if (game != null) {
       controller.push(new ObserveGameView(authToken, game));
     }
   }
@@ -127,6 +191,7 @@ public class PostloginView extends ReplView {
 
         [c]reate <name>       | Create a new game
         [s]how                | Show a list of all games
+        [j]oin <game id>      | Join a game
         [o]bserve <game id>   | Observe a game
         [l]ogout              | Log out of your current session
         [h]elp                | Show this help message
@@ -135,5 +200,22 @@ public class PostloginView extends ReplView {
       """;
     
     console.printf(helpText);
+  }
+
+  private GameData getGame(String idStr) {
+    int id;
+    try {
+      id = Integer.parseInt(idStr);
+    } catch (NumberFormatException e) {
+      console.printf("Invalid game id: %s is not a number\n", idStr);
+      return null;
+    }
+
+    var game = games.get(id);
+    if (game == null) {
+      console.printf("No game with id %s. Use 'show' to see a list of all games\n", idStr);
+    }
+
+    return game;
   }
 }

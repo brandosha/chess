@@ -45,7 +45,7 @@ public class PreloginView extends ReplView {
       var request = new RegisterRequest(argv[1], password, "");
       var response = ServerFacade.local.register(request);
       
-      controller.push(new PostloginView(response.authToken));
+      controller.push(new PostloginView(response.authToken, response.username));
     } catch (ServerResponseException | IOException | InterruptedException e) {
       console.printf("Registration failed: %s\n", e.getMessage());
     }
@@ -62,7 +62,7 @@ public class PreloginView extends ReplView {
       var request = new LoginRequest(argv[1], password);
       var response = ServerFacade.local.login(request);
       
-      controller.push(new PostloginView(response.authToken));
+      controller.push(new PostloginView(response.authToken, response.username));
     } catch (ServerResponseException | IOException | InterruptedException e) {
       console.printf("Login failed: %s\n", e.getMessage());
     }
