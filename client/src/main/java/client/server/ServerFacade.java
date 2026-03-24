@@ -10,6 +10,8 @@ import java.net.http.HttpResponse;
 
 import com.google.gson.Gson;
 
+import datamodel.http.CreateGameRequest;
+import datamodel.http.CreateGameResponse;
 import datamodel.http.LoginRequest;
 import datamodel.http.LoginResponse;
 import datamodel.http.RegisterRequest;
@@ -68,9 +70,25 @@ public class ServerFacade {
     }
   }
 
+  public CreateGameResponse createGame(CreateGameRequest createRequest, String authToken) throws ServerResponseException, IOException, InterruptedException {
+    var uri = this.uri("/game");
+    var body = gson.toJson(createRequest);
+    var req = HttpRequest.newBuilder(uri)
+              .POST(HttpRequest.BodyPublishers.ofString(body))
+              .header("Authorization", authToken)
+              .build();
+
+    var res = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+    if (res.statusCode() == 200) {
+      return gson.fromJson(res.body(), CreateGameResponse.class);
+    } else {
+      throw ServerResponseException.fromResponse(res);
+    }
+  }
+
   private URI uri(String path) {
     try {
-      return new URI("http", "", hostname, port, path, "", "");
+      return new URI("http", null, hostname, port, path, null, null);
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
