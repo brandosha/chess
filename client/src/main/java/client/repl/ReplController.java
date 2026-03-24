@@ -9,7 +9,7 @@ public class ReplController {
   private boolean stopped = false;
 
   public void start(ReplView startView) {
-    if (console == null || !console.isTerminal()) {
+    if (console == null) {
       throw new RuntimeException("REPL can only by run in a command line environment");
     }
 
