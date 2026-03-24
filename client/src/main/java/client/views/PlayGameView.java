@@ -5,6 +5,7 @@ import client.repl.ReplView;
 import datamodel.GameData;
 
 public class PlayGameView extends ReplView {
+  
   private final String authToken;
   private final GameData game;
   private final ChessGame.TeamColor perspective;

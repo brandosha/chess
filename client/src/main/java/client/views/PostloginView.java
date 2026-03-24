@@ -39,10 +39,10 @@ public class PostloginView extends ReplView {
 
     switch (argv[0]) {
       case "c", "create" -> create(argv);
-      case "s", "show" -> show();
+      case "l", "list" -> show();
       case "j", "join" -> join(argv);
       case "o", "observe" -> observe(argv);
-      case "l", "logout" -> logout();
+      case "g", "logout" -> logout();
       case "h", "help" -> help();
       case "q", "quit" -> controller.stop();
       default -> console.printf("Unknown command \"%s\"\n", argv[0]);
@@ -190,10 +190,10 @@ public class PostloginView extends ReplView {
     String helpText = """
 
         [c]reate <name>       | Create a new game
-        [s]how                | Show a list of all games
+        [l]ist                | Show a list of all games
         [j]oin <game id>      | Join a game
         [o]bserve <game id>   | Observe a game
-        [l]ogout              | Log out of your current session
+        lo[g]out              | Log out of your current session
         [h]elp                | Show this help message
         [q]uit                | Exit the app
 

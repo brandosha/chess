@@ -32,8 +32,6 @@ public class ServerFacade {
   public ServerFacade(String hostname, int port) {
     this.hostname = hostname;
     this.port = port;
-
-    System.out.println(this.uri("/test"));
   }
 
   public RegisterResponse register(RegisterRequest registerRequest) throws ServerResponseException, IOException, InterruptedException {
@@ -121,13 +119,4 @@ public class ServerFacade {
       throw new RuntimeException(e);
     }
   }
-
-  private URI uri(String path, String query) {
-    try {
-      return new URI("http", "", hostname, port, path, query, "");
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
 }
