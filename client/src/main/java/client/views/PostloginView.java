@@ -1,15 +1,18 @@
 package client.views;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import client.repl.ReplView;
 import client.server.ServerFacade;
 import client.server.ServerResponseException;
+import datamodel.GameData;
 import datamodel.http.CreateGameRequest;
 
 public class PostloginView extends ReplView {
 
   private final String authToken;
+  private HashMap<Integer, GameData> games = new HashMap<>();
 
   public PostloginView(String authToken) {
     this.authToken = authToken;
@@ -31,6 +34,7 @@ public class PostloginView extends ReplView {
 
     switch (argv[0]) {
       case "c", "create" -> create(argv);
+      case "s", "show" -> show();
       case "l", "logout" -> logout();
       case "h", "help" -> help();
       case "q", "quit" -> controller.stop();
@@ -61,7 +65,6 @@ public class PostloginView extends ReplView {
     try {
       var request = new CreateGameRequest(args[1]);
       var response = ServerFacade.local.createGame(request, authToken);
-
       console.printf("Game created\n  %d. %s\n", response.gameID, args[1]);
     } catch (IOException | InterruptedException e) {
       console.printf("Failed to create game: %s\n", e.getMessage());
@@ -73,13 +76,34 @@ public class PostloginView extends ReplView {
         console.printf("Failed to create game: %s\n", e.getMessage());
       }
     }
+  }
 
+  public void show() {
+    try {
+      var response = ServerFacade.local.listGames(authToken);
+
+      games.clear();
+      for (GameData game : response.games) {
+        games.put(game.gameID, game);
+        console.printf("  %d. %s\n", game.gameID, game.gameName);
+      }
+    } catch (IOException | InterruptedException e) {
+      console.printf("Failed to get games: %s\n", e.getMessage());
+    } catch (ServerResponseException e) {
+      if (e.response.statusCode() == 401) {
+        console.printf("Session has ended, logging out.\n");
+        close();
+      } else {
+        console.printf("Failed to get games: %s\n", e.getMessage());
+      }
+    }
   }
 
   public void help() {
     String helpText = """
 
         [c]reate <name>       | Create a new game
+        [s]how                | Show a list of all games
         [l]ogout              | Log out of your current session
         [h]elp                | Show this help message
         [q]uit                | Exit the app

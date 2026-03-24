@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 
 import datamodel.http.CreateGameRequest;
 import datamodel.http.CreateGameResponse;
+import datamodel.http.ListGamesResponse;
 import datamodel.http.LoginRequest;
 import datamodel.http.LoginResponse;
 import datamodel.http.RegisterRequest;
@@ -83,6 +84,18 @@ public class ServerFacade {
       return gson.fromJson(res.body(), CreateGameResponse.class);
     } else {
       throw ServerResponseException.fromResponse(res);
+    }
+  }
+
+  public ListGamesResponse listGames(String authToken) throws ServerResponseException, IOException, InterruptedException {
+    var uri = this.uri("/game");
+    var req = HttpRequest.newBuilder(uri).GET().header("Authorization", authToken).build();
+
+    var res = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+    if (res.statusCode() != 200) {
+      throw ServerResponseException.fromResponse(res);
+    } else {
+      return gson.fromJson(res.body(), ListGamesResponse.class);
     }
   }
 
