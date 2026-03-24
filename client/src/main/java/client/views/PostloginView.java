@@ -35,6 +35,7 @@ public class PostloginView extends ReplView {
     switch (argv[0]) {
       case "c", "create" -> create(argv);
       case "s", "show" -> show();
+      case "o", "observe" -> observe(argv);
       case "l", "logout" -> logout();
       case "h", "help" -> help();
       case "q", "quit" -> controller.stop();
@@ -85,7 +86,7 @@ public class PostloginView extends ReplView {
       games.clear();
       for (GameData game : response.games) {
         games.put(game.gameID, game);
-        console.printf("  %d. %s\n", game.gameID, game.gameName);
+        console.printf("%d. %s\n", game.gameID, game.gameName);
       }
     } catch (IOException | InterruptedException e) {
       console.printf("Failed to get games: %s\n", e.getMessage());
@@ -99,11 +100,34 @@ public class PostloginView extends ReplView {
     }
   }
 
+  public void observe(String[] argv) {
+    if (argv.length != 2) {
+      console.printf("Usage: [o]bserve <game id>\n");
+      return;
+    }
+
+    int id = -1;
+    try {
+      id = Integer.parseInt(argv[1]);
+    } catch (NumberFormatException e) {
+      console.printf("Invalid game id: %s is not a number\n", argv[1]);
+      return;
+    }
+
+    var game = games.get(id);
+    if (game == null) {
+      console.printf("No game with id %s. Use 'show' to see a list of all games\n", argv[1]);
+    } else {
+      controller.push(new ObserveGameView(authToken, game));
+    }
+  }
+
   public void help() {
     String helpText = """
 
         [c]reate <name>       | Create a new game
         [s]how                | Show a list of all games
+        [o]bserve <game id>   | Observe a game
         [l]ogout              | Log out of your current session
         [h]elp                | Show this help message
         [q]uit                | Exit the app
@@ -112,5 +136,4 @@ public class PostloginView extends ReplView {
     
     console.printf(helpText);
   }
-  
 }
