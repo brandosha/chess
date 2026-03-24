@@ -60,9 +60,9 @@ public class ServerFacade {
     }
   }
 
-  public void logout() throws ServerResponseException, IOException, InterruptedException {
+  public void logout(String authToken) throws ServerResponseException, IOException, InterruptedException {
     var uri = this.uri("/session");
-    var req = HttpRequest.newBuilder(uri).DELETE().build();
+    var req = HttpRequest.newBuilder(uri).DELETE().header("Authorization", authToken).build();
 
     var res = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
     if (res.statusCode() != 200) {

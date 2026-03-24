@@ -40,7 +40,7 @@ public class PostloginView extends ReplView {
 
   public void logout() {
     try {
-      ServerFacade.local.logout();
+      ServerFacade.local.logout(authToken);
       close();
     } catch (IOException | InterruptedException e) {
       console.printf("Logout failed: %s\n", e.getMessage());
