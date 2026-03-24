@@ -40,7 +40,7 @@ public class PostloginView extends ReplView {
 
     switch (argv[0]) {
       case "c", "create" -> create(argv);
-      case "l", "list" -> show();
+      case "l", "list" -> list();
       case "j", "join" -> join(argv);
       case "o", "observe" -> observe(argv);
       case "g", "logout" -> logout();
@@ -72,8 +72,11 @@ public class PostloginView extends ReplView {
     
     try {
       var request = new CreateGameRequest(args[1]);
-      var response = serverFacade.createGame(request, authToken);
-      console.printf("Game created\n  %d. %s\n", response.gameID, args[1]);
+      // var response = serverFacade.createGame(request, authToken);
+      // console.printf("Game created\n  %d. %s\n", response.gameID, args[1]);
+      serverFacade.createGame(request, authToken);
+      console.printf("Game created\n");
+      list();
     } catch (IOException | InterruptedException e) {
       console.printf("Failed to create game: %s\n", e.getMessage());
     } catch (ServerResponseException e) {
@@ -86,7 +89,7 @@ public class PostloginView extends ReplView {
     }
   }
 
-  public void show() {
+  public void list() {
     try {
       var response = serverFacade.listGames(authToken);
 
@@ -162,6 +165,11 @@ public class PostloginView extends ReplView {
     try {
       var request = new JoinGameRequest(color, game.gameID);
       serverFacade.joinGame(request, authToken);
+      
+      switch (team) {
+        case BLACK -> game.blackUsername = username;
+        case WHITE -> game.whiteUsername = username;
+      }
       controller.push(new PlayGameView(authToken, game, team));
     } catch (IOException | InterruptedException e) {
       console.printf("Failed to join game: %s\n", e.getMessage());
