@@ -112,6 +112,16 @@ public class ServerFacade {
     }
   }
 
+  public void clear() throws ServerResponseException, IOException, InterruptedException {
+    var uri = this.uri("/db");
+    var req = HttpRequest.newBuilder(uri).DELETE().build();
+
+    var res = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+    if (res.statusCode() != 200) {
+      throw ServerResponseException.fromResponse(res);
+    }
+  }
+
   private URI uri(String path) {
     try {
       return new URI("http", null, hostname, port, path, null, null);
