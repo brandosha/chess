@@ -94,9 +94,13 @@ public class PostloginView extends ReplView {
       var response = serverFacade.listGames(authToken);
 
       games.clear();
+      int i = 1;
       for (GameData game : response.games) {
-        games.put(game.gameID, game);
-        console.printf("%d. %s\n", game.gameID, game.gameName);
+        games.put(i, game);
+        console.printf("%d. %s\n", i, game.gameName);
+        console.printf(" - Black: %s\n", game.blackUsername == null ? "--" : game.blackUsername);
+        console.printf(" - White: %s\n\n", game.whiteUsername == null ? "--" : game.whiteUsername);
+        i += 1;
       }
     } catch (IOException | InterruptedException e) {
       console.printf("Failed to get games: %s\n", e.getMessage());
@@ -123,23 +127,17 @@ public class PostloginView extends ReplView {
 
     String players = "Players:\n";
     if (game.blackUsername == null) {
-      players += "  Black: --\n";
+      players += " - Black: --\n";
       availableColors.add("b");
-    } else if (game.blackUsername.equals(username)) {
-      controller.push(new PlayGameView(authToken, game, ChessGame.TeamColor.BLACK));
-      return;
     } else {
-      players += "  Black: " + game.blackUsername + "\n";
+      players += " - Black: " + game.blackUsername + "\n";
     }
 
     if (game.whiteUsername == null) {
-      players += "  White: --";
+      players += " - White: --";
       availableColors.add("w");
-    } else if (game.whiteUsername.equals(username)) {
-      controller.push(new PlayGameView(authToken, game, ChessGame.TeamColor.WHITE));
-      return;
     } else {
-      players += "  White: " + game.whiteUsername;
+      players += " - White: " + game.whiteUsername;
     }
 
     console.printf("%s\n", players);
@@ -165,7 +163,7 @@ public class PostloginView extends ReplView {
     try {
       var request = new JoinGameRequest(color, game.gameID);
       serverFacade.joinGame(request, authToken);
-      
+
       switch (team) {
         case BLACK -> game.blackUsername = username;
         case WHITE -> game.whiteUsername = username;
@@ -222,7 +220,7 @@ public class PostloginView extends ReplView {
 
     var game = games.get(id);
     if (game == null) {
-      console.printf("No game with id %s. Use 'show' to see a list of all games\n", idStr);
+      console.printf("No game with id %s. Use 'list' to see a list of all games\n", idStr);
     }
 
     return game;

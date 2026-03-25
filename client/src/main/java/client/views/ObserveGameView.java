@@ -21,7 +21,7 @@ public class ObserveGameView extends ReplView {
   @Override
   public void onAppear() {
     help();
-    draw();
+    drawGame();
   }
 
   @Override
@@ -33,14 +33,14 @@ public class ObserveGameView extends ReplView {
     }
 
     switch (argv[0]) {
-      case "d", "draw" -> draw();
+      case "d", "draw" -> drawGame();
       case "s", "stop" -> close();
       case "h", "help" -> help();
       default -> console.printf("Unknown command \"%s\"\n", argv[0]);
     }
   }
 
-  public void draw() {
+  public void drawGame() {
     console.printf("%s", drawBoardString(game, ChessGame.TeamColor.WHITE));
   }
 
