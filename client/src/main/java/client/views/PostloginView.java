@@ -27,6 +27,8 @@ public class PostloginView extends ReplView {
 
   @Override
   public void onAppear() {
+    console.printf("\n\nGames:\n");
+    list();
     help();
   }
 
@@ -66,12 +68,17 @@ public class PostloginView extends ReplView {
   }
 
   public void create(String[] args) {
-    if (args.length != 2) {
+    if (args.length < 2) {
       console.printf("Usage: [c]reate <name>");
+    }
+
+    String name = args[1];
+    for (int i = 2; i < args.length; i++) {
+      name += " " + args[i];
     }
     
     try {
-      var request = new CreateGameRequest(args[1]);
+      var request = new CreateGameRequest(name);
       // var response = serverFacade.createGame(request, authToken);
       // console.printf("Game created\n  %d. %s\n", response.gameID, args[1]);
       serverFacade.createGame(request, authToken);
