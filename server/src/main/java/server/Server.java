@@ -8,6 +8,7 @@ import datamodel.http.InvalidRequestException;
 import handler.DataHandler;
 import handler.GameHandler;
 import handler.UserHandler;
+import handler.WsGameplayHandler;
 import io.javalin.Javalin;
 import io.javalin.http.ExceptionHandler;
 import service.AlreadyTakenException;
@@ -34,6 +35,14 @@ public class Server {
 
         var dataHandler = new DataHandler(db);
         javalin.delete("/db", dataHandler::clearDb);
+
+        var gameplayHandler = new WsGameplayHandler(db);
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(gameplayHandler);
+            ws.onMessage(gameplayHandler);
+            ws.onClose(gameplayHandler);
+            ws.onError(gameplayHandler);
+        });
 
         javalin.exception(InvalidRequestException.class, excHandler(400));
         javalin.exception(UnauthorizedException.class, excHandler(401));
