@@ -2,15 +2,21 @@ package client.views;
 
 import chess.ChessGame;
 import client.repl.ReplView;
+import client.server.ServerFacade;
+import client.server.WebSocketFacade;
 import datamodel.GameData;
 
 public class PlayGameView extends ReplView {
   
+  private final ServerFacade serverFacade;
+  private final WebSocketFacade wsFacade;
   private final String authToken;
   private final GameData game;
   private final ChessGame.TeamColor perspective;
 
-  public PlayGameView(String authToken, GameData game, ChessGame.TeamColor perspective) {
+  public PlayGameView(ServerFacade serverFacade, String authToken, GameData game, ChessGame.TeamColor perspective) {
+    this.serverFacade = serverFacade;
+    this.wsFacade = serverFacade.webSocket();
     this.authToken = authToken;
     this.game = game;
     this.perspective = perspective;

@@ -5,15 +5,19 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import client.repl.ReplView;
+import client.server.ServerFacade;
+import client.server.WebSocketFacade;
 import datamodel.GameData;
 import ui.EscapeSequences;
 
 public class ObserveGameView extends ReplView {
 
+  private final WebSocketFacade wsFacade;
   private final String authToken;
   private final GameData game;
 
-  public ObserveGameView(String authToken, GameData game) {
+  public ObserveGameView(ServerFacade serverFacade, String authToken, GameData game) {
+    this.wsFacade = serverFacade.webSocket();
     this.authToken = authToken;
     this.game = game;
   }

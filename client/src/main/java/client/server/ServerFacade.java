@@ -128,6 +128,10 @@ public class ServerFacade {
     }
   }
 
+  public WebSocketFacade webSocket() {
+    return new WebSocketFacade(hostname, port);
+  }
+
   private URI uri(String path) {
     try {
       return new URI("http", null, hostname, port, path, null, null);

@@ -175,7 +175,7 @@ public class PostloginView extends ReplView {
         case BLACK -> game.blackUsername = username;
         case WHITE -> game.whiteUsername = username;
       }
-      controller.push(new PlayGameView(authToken, game, team));
+      controller.push(new PlayGameView(serverFacade, authToken, game, team));
     } catch (IOException | InterruptedException e) {
       console.printf("Failed to join game: %s\n", e.getMessage());
     } catch (ServerResponseException e) {
@@ -196,7 +196,7 @@ public class PostloginView extends ReplView {
 
     var game = getGame(argv[1]);
     if (game != null) {
-      controller.push(new ObserveGameView(authToken, game));
+      controller.push(new ObserveGameView(serverFacade, authToken, game));
     }
   }
 
