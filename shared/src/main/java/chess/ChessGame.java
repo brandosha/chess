@@ -102,7 +102,7 @@ public class ChessGame {
         }
 
         if (!validMoves(startPos).contains(move)) {
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("Not a valid move");
         }
 
         if (makeCastlingMove(move)) {}

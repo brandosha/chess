@@ -2,6 +2,8 @@ package websocket.commands;
 
 import java.util.Objects;
 
+import chess.ChessMove;
+
 /**
  * Represents a command a user can send the server over a websocket
  * <p>
@@ -11,10 +13,10 @@ import java.util.Objects;
 public class UserGameCommand {
 
     private final CommandType commandType;
-
     private final String authToken;
-
     private final Integer gameID;
+    
+    public ChessMove move;  // for type MAKE_MOVE
 
     public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
         this.commandType = commandType;

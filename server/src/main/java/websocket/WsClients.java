@@ -44,6 +44,16 @@ public class WsClients {
     }
   }
 
+  public void broadcast(String channel, String msg, WsContext except) {
+    var subscribed = channels.get(channel);
+    if (subscribed != null) {
+      for (Client client : subscribed) {
+        if (client.ctx.equals(except)) { continue; } 
+        send(client, msg);
+      }
+    }
+  }
+
   public synchronized void unsubscribeClient(WsContext ctx, String channel) {
     var sid = ctx.sessionId();
     var client = clients.get(sid);

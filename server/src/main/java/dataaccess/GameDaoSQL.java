@@ -89,6 +89,8 @@ public class GameDaoSQL implements GameDao {
       + "  WHERE id = ?";
     
     try (var conn = DatabaseManager.getConnection()) {
+      conn.setAutoCommit(false);
+
       try (var statement = conn.prepareStatement(update)) {
         statement.setString(1, game.gameName);
         statement.setString(2, game.whiteUsername);
@@ -98,6 +100,8 @@ public class GameDaoSQL implements GameDao {
         var rowsUpdated = statement.executeUpdate();
 
         if (rowsUpdated == 1) {
+          conn.commit();
+          System.err.println("Commited updateGame");
           return game;
         } else if (rowsUpdated > 1) {
           throw new RuntimeException("Update statement updated more than one row");
@@ -144,7 +148,9 @@ public class GameDaoSQL implements GameDao {
     var list = new ArrayList<GameData>();
     try (var conn = DatabaseManager.getConnection()) {
       try (var statement = conn.createStatement()) {
+        System.err.println("About to execute query for listGames");
         var results = statement.executeQuery(select);
+        System.err.println("Finished executing query for listGames");
         while (results.next()) {
           var gameJson = results.getString(5);
           var data = new GameData(

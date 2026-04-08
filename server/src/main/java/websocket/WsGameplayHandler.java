@@ -2,6 +2,8 @@ package websocket;
 
 import com.google.gson.Gson;
 
+import chess.ChessGame;
+import chess.InvalidMoveException;
 import dataaccess.DataAccessException;
 import dataaccess.Database;
 import datamodel.UserData;
@@ -17,6 +19,7 @@ import service.UnauthorizedException;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 import static websocket.messages.ServerMessage.ServerMessageType.ERROR;
+import static websocket.messages.ServerMessage.ServerMessageType.LOAD_GAME;
 import static websocket.messages.ServerMessage.ServerMessageType.NOTIFICATION;
 
 public class WsGameplayHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler, WsErrorHandler {
@@ -45,6 +48,7 @@ public class WsGameplayHandler implements WsConnectHandler, WsMessageHandler, Ws
 
       switch (cmd.getCommandType()) {
         case CONNECT -> connectToGame(wmc, cmd);
+        case MAKE_MOVE -> makeMove(wmc, cmd);
         case LEAVE -> leaveGame(wmc, cmd);
       }
 
@@ -90,6 +94,55 @@ public class WsGameplayHandler implements WsConnectHandler, WsMessageHandler, Ws
     var loadGame = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
     loadGame.game = game;
     wmc.send(gson.toJson(loadGame));
+  }
+
+  private void makeMove(WsMessageContext wmc, UserGameCommand cmd) throws DataAccessException, UnauthorizedException, InvalidMoveException {
+    var user = checkAuth(cmd);
+    var username = user.username;
+
+    var gdata = db.gameDao.getGame(cmd.getGameID());
+    var game = gdata.game;
+
+    ChessGame.TeamColor userTeam = null;
+    if (username.equals(gdata.blackUsername)) {
+      userTeam = ChessGame.TeamColor.BLACK;
+    } else if (username.equals(gdata.whiteUsername)) {
+      userTeam = ChessGame.TeamColor.WHITE;
+    }
+
+    if (userTeam == null) {
+      throw new UnauthorizedException();
+    } else if (userTeam != game.getTeamTurn()) {
+      throw new UnauthorizedException("Not your turn");
+    }
+
+    var move = cmd.move;
+    game.makeMove(move);
+
+    db.gameDao.updateGame(gdata);
+    var gameChannel = "game/" + cmd.getGameID();
+    var loadGame = new ServerMessage(LOAD_GAME);
+    loadGame.game = gdata;
+    clients.broadcast(gameChannel, gson.toJson(loadGame));
+
+    var notif = new ServerMessage(NOTIFICATION);
+    notif.message = username + " moved";
+    clients.broadcast(gameChannel, gson.toJson(notif), wmc);
+
+    var otherTeam = game.getTeamTurn();
+    if (game.isInCheckmate(otherTeam)) {
+      notif = new ServerMessage(NOTIFICATION);
+      notif.message = "checkmate";
+      clients.broadcast(gameChannel, gson.toJson(notif));
+    } else if (game.isInStalemate(otherTeam)) {
+      notif = new ServerMessage(NOTIFICATION);
+      notif.message = "stalemate";
+      clients.broadcast(gameChannel, gson.toJson(notif));
+    } else if (game.isInCheck(otherTeam)) {
+      notif = new ServerMessage(NOTIFICATION);
+      notif.message = "check";
+      clients.broadcast(gameChannel, gson.toJson(notif));
+    }
   }
 
   private void leaveGame(WsMessageContext wmc, UserGameCommand cmd) throws DataAccessException, UnauthorizedException {
