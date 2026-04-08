@@ -1,5 +1,7 @@
 package client.views;
 
+import java.io.IOException;
+
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
@@ -24,8 +26,14 @@ public class ObserveGameView extends ReplView {
 
   @Override
   public void onAppear() {
-    help();
-    drawGame();
+    try {
+      wsFacade.connectToGame(game.gameID, authToken);
+      help();
+      drawGame();
+    } catch (IOException e) {
+      console.printf("An error occurred while connecting to the game:\n%s\n\n", e.getMessage());
+      close();
+    }
   }
 
   @Override

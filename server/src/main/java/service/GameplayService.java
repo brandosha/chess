@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.Database;
 
 public class GameplayService extends BaseService {
@@ -8,6 +9,9 @@ public class GameplayService extends BaseService {
     super(db);
   }
 
-  
+  public void connectToGame(int gameID, String authToken) throws DataAccessException {
+    var game = db.gameDao.getGame(gameID);
+    
+  }
   
 }

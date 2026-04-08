@@ -13,6 +13,7 @@ import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.MessageHandler;
 import jakarta.websocket.Session;
 import jakarta.websocket.WebSocketContainer;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 public class WebSocketFacade extends Endpoint {
@@ -39,6 +40,20 @@ public class WebSocketFacade extends Endpoint {
       });
     } catch (DeploymentException | IOException | IllegalStateException e) {
     }
+  }
+
+  private void sendCommand(UserGameCommand cmd) throws IOException {
+    var json = gson.toJson(cmd);
+    session.getBasicRemote().sendText(json);
+  }
+
+  public void connectToGame(int gameID, String authToken) throws IOException {
+    var cmd = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+    sendCommand(cmd);
+  }
+
+  public void disconnect() throws IOException {
+    session.close();
   }
 
   private URI uri(String path) {

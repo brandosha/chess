@@ -13,6 +13,7 @@ import io.javalin.websocket.WsErrorHandler;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import service.GameplayService;
+import websocket.commands.UserGameCommand;
 
 public class WsGameplayHandler extends BaseHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler, WsErrorHandler {
 
@@ -25,13 +26,23 @@ public class WsGameplayHandler extends BaseHandler implements WsConnectHandler, 
 
   @Override
   public synchronized void handleConnect(WsConnectContext wcc) throws Exception {
-    String authToken = wcc.header("Authorization");
-    clients.put(wcc.sessionId(), new WsClient(wcc, authToken));
+    clients.put(wcc.sessionId(), new WsClient(wcc));
+    System.out.println("New websocket client: " + wcc.sessionId());
   }
 
   @Override
   public void handleMessage(WsMessageContext wmc) throws Exception {
-    
+    var msg = wmc.message();
+    try {
+      var cmd = gson.fromJson(msg, UserGameCommand.class);
+
+      switch (cmd.getCommandType()) {
+        case CONNECT -> service.connectToGame(cmd.getGameID(), cmd.getAuthToken());
+      }
+
+    } catch (Exception e) {
+      System.err.println(e);
+    }
   }
 
   @Override
@@ -45,12 +56,10 @@ public class WsGameplayHandler extends BaseHandler implements WsConnectHandler, 
   }
 
   private class WsClient {
-    WsContext ctx;
-    String authToken;
+    final WsContext ctx;
 
-    public WsClient(WsContext ctx, String authToken) {
+    public WsClient(WsContext ctx) {
       this.ctx = ctx;
-      this.authToken = authToken;
     }
   }
   
