@@ -9,14 +9,13 @@ import datamodel.GameData;
 public class PlayGameView extends ReplView {
   
   private final ServerFacade serverFacade;
-  private final WebSocketFacade wsFacade;
+  private WebSocketFacade wsFacade;
   private final String authToken;
   private final GameData game;
   private final ChessGame.TeamColor perspective;
 
   public PlayGameView(ServerFacade serverFacade, String authToken, GameData game, ChessGame.TeamColor perspective) {
     this.serverFacade = serverFacade;
-    this.wsFacade = serverFacade.webSocket();
     this.authToken = authToken;
     this.game = game;
     this.perspective = perspective;
@@ -45,7 +44,7 @@ public class PlayGameView extends ReplView {
   }
 
   public void draw() {
-    console.printf("%s", ObserveGameView.drawBoardString(game, perspective));
+    console.printf("%s", ObserveGameView.gameBoardString(game, perspective));
   }
 
   public void help() {

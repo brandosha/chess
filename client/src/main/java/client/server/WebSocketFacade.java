@@ -3,6 +3,7 @@ package client.server;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.function.Consumer;
 
 import com.google.gson.Gson;
 
@@ -23,23 +24,24 @@ public class WebSocketFacade extends Endpoint {
 
   final Gson gson = new Gson();
   Session session;
+  Consumer<ServerMessage> listener;
 
   public WebSocketFacade(String hostname, int port) {
     this.hostname = hostname;
     this.port = port;
+  }
 
-    try {
-      WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-      this.session = container.connectToServer(this, uri("/ws"));
-      this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-        @Override
-        public void onMessage(String message) {
-          var msg = gson.fromJson(message, ServerMessage.class);
-          System.err.println("[ws] Recieved " + message);
-        }
-      });
-    } catch (DeploymentException | IOException | IllegalStateException e) {
-    }
+  public void connect() throws DeploymentException, IOException {
+    WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+    this.session = container.connectToServer(this, uri("/ws"));
+    this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+      @Override
+      public void onMessage(String message) {
+        System.err.println("[ws] Recieved " + message);
+        var msg = gson.fromJson(message, ServerMessage.class);
+        listener.accept(msg);
+      }
+    });
   }
 
   private void sendCommand(UserGameCommand cmd) throws IOException {
@@ -48,7 +50,8 @@ public class WebSocketFacade extends Endpoint {
     session.getBasicRemote().sendText(json);
   }
 
-  public void connectToGame(int gameID, String authToken) throws IOException {
+  public void connectToGame(int gameID, String authToken, Consumer<ServerMessage> listener) throws IOException {
+    this.listener = listener;
     var cmd = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
     sendCommand(cmd);
   }

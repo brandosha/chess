@@ -18,6 +18,7 @@ import datamodel.http.LoginRequest;
 import datamodel.http.LoginResponse;
 import datamodel.http.RegisterRequest;
 import datamodel.http.RegisterResponse;
+import jakarta.websocket.DeploymentException;
 
 public class ServerFacade {
 
@@ -128,8 +129,10 @@ public class ServerFacade {
     }
   }
 
-  public WebSocketFacade webSocket() {
-    return new WebSocketFacade(hostname, port);
+  public WebSocketFacade webSocket() throws DeploymentException, IOException {
+    var ws = new WebSocketFacade(hostname, port);
+    ws.connect();
+    return ws;
   }
 
   private URI uri(String path) {

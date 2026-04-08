@@ -10,16 +10,19 @@ import client.repl.ReplView;
 import client.server.ServerFacade;
 import client.server.WebSocketFacade;
 import datamodel.GameData;
+import jakarta.websocket.DeploymentException;
 import ui.EscapeSequences;
+import websocket.messages.ServerMessage;
 
 public class ObserveGameView extends ReplView {
 
-  private final WebSocketFacade wsFacade;
+  private final ServerFacade serverFacade;
+  private WebSocketFacade wsFacade;
   private final String authToken;
-  private final GameData game;
+  private GameData game;
 
   public ObserveGameView(ServerFacade serverFacade, String authToken, GameData game) {
-    this.wsFacade = serverFacade.webSocket();
+    this.serverFacade = serverFacade;
     this.authToken = authToken;
     this.game = game;
   }
@@ -27,13 +30,24 @@ public class ObserveGameView extends ReplView {
   @Override
   public void onAppear() {
     try {
-      wsFacade.connectToGame(game.gameID, authToken);
+      wsFacade = serverFacade.webSocket();
+      wsFacade.connectToGame(game.gameID, authToken, this::recvMessage);
       help();
-      drawGame();
-    } catch (IOException e) {
+    } catch (DeploymentException | IOException e) {
       console.printf("An error occurred while connecting to the game:\n%s\n\n", e.getMessage());
       close();
     }
+  }
+
+  void recvMessage(ServerMessage msg) {
+    switch (msg.getServerMessageType()) {
+      case LOAD_GAME -> loadGame(msg.game);
+    }
+  }
+
+  void loadGame(GameData game) {
+    this.game = game;
+    drawGame();
   }
 
   @Override
@@ -53,7 +67,10 @@ public class ObserveGameView extends ReplView {
   }
 
   public void drawGame() {
-    console.printf("%s", drawBoardString(game, ChessGame.TeamColor.WHITE));
+    // We can't use console because it's synchronized but this should
+    // be asynchrounous because it's drawn in response to a WebSocket event
+    System.out.printf("%s\n> ", gameBoardString(game, ChessGame.TeamColor.WHITE));
+    System.out.flush();
   }
 
   public void help() {
@@ -68,7 +85,7 @@ public class ObserveGameView extends ReplView {
     console.printf(helpText);
   }
 
-  public static String drawBoardString(GameData g, ChessGame.TeamColor perspective) {
+  public static String gameBoardString(GameData g, ChessGame.TeamColor perspective) {
     ChessBoard board = g.game.getBoard();
     String s = "\n";
 
