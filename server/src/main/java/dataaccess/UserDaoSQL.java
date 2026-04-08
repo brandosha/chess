@@ -149,7 +149,7 @@ public class UserDaoSQL implements UserDao {
     var select = "SELECT u.username, u.password, u.email"
       + "  FROM " + authTableName + " a"
       + "  INNER JOIN " + usersTableName + " u ON"
-      + "    (u.username = u.username)"
+      + "    (u.username = a.username)"
       + "  WHERE token = ?";
 
     try (var conn = DatabaseManager.getConnection()) {
