@@ -16,9 +16,9 @@ import websocket.messages.ServerMessage;
 
 public class ObserveGameView extends ReplView {
 
-  private final ServerFacade serverFacade;
-  private WebSocketFacade wsFacade;
-  private final String authToken;
+  final ServerFacade serverFacade;
+  WebSocketFacade wsFacade;
+  final String authToken;
   GameData game;
 
   public ObserveGameView(ServerFacade serverFacade, String authToken, GameData game) {
@@ -42,6 +42,7 @@ public class ObserveGameView extends ReplView {
   @Override
   public void close() {
     try {
+      wsFacade.leaveGame(game.gameID, authToken);
       wsFacade.disconnect();
       super.close();
     } catch (IOException e) {
@@ -51,13 +52,27 @@ public class ObserveGameView extends ReplView {
 
   void recvMessage(ServerMessage msg) {
     switch (msg.getServerMessageType()) {
-      case LOAD_GAME -> loadGame(msg.game);
-    }
-  }
+      case LOAD_GAME -> {
+        this.game = msg.game;
+        draw();
+      }
+      case NOTIFICATION -> {
+        var message =
+          EscapeSequences.SET_TEXT_COLOR_GREEN +
+          "> " + msg.message +
+          EscapeSequences.RESET_TEXT_COLOR;
+        
+        System.out.printf("\n%s\n> ", message);
+      }
+      case ERROR -> {
+        var error =
+          EscapeSequences.SET_TEXT_COLOR_RED +
+          "> Error: " + msg.errorMessage +
+          EscapeSequences.RESET_TEXT_COLOR;
 
-  void loadGame(GameData game) {
-    this.game = game;
-    draw();
+        System.out.printf("\n%s\n> ", error);
+      }
+    }
   }
 
   @Override

@@ -39,7 +39,7 @@ public class UserService extends BaseService {
 
     var user = dao.getUser(req.username);
     if (user == null || !BCrypt.checkpw(req.password, user.password)) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("Incorrect username or password");
     }
 
     var authData = AuthData.generate(user.username);

@@ -35,6 +35,15 @@ public class PlayGameView extends ObserveGameView {
     System.out.flush();
   }
 
+  // public void leave() {
+  //   try {
+  //     wsFacade.leaveGame(game.gameID, authToken);
+  //     close();
+  //   } catch (IOException e) {
+  //     console.printf("Failed to leave game:\n%s", e.getMessage());
+  //   }
+  // }
+
   @Override
   public void help() {
     String helpText = """

@@ -149,8 +149,8 @@ public class PostloginView extends ReplView {
       availableColors.add("w");
     } else {
       players += " - White: " + game.whiteUsername;
-      if (game.blackUsername.equals(username)) {
-        availableColors.add("b");
+      if (game.whiteUsername.equals(username)) {
+        availableColors.add("w");
       }
     }
 
