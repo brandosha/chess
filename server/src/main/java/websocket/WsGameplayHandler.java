@@ -2,6 +2,7 @@ package websocket;
 
 import com.google.gson.Gson;
 
+import dataaccess.DataAccessException;
 import dataaccess.Database;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsCloseHandler;
@@ -11,8 +12,10 @@ import io.javalin.websocket.WsErrorContext;
 import io.javalin.websocket.WsErrorHandler;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
+import service.UnauthorizedException;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
+import static websocket.messages.ServerMessage.ServerMessageType.ERROR;
 
 public class WsGameplayHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler, WsErrorHandler {
 
@@ -44,6 +47,10 @@ public class WsGameplayHandler implements WsConnectHandler, WsMessageHandler, Ws
 
     } catch (Exception e) {
       System.err.println(e);
+
+      var error = new ServerMessage(ERROR);
+      error.errorMessage = e.getMessage();
+      wmc.send(gson.toJson(error));
     }
   }
 
@@ -59,13 +66,28 @@ public class WsGameplayHandler implements WsConnectHandler, WsMessageHandler, Ws
   }
   
 
-  private void connectToGame(WsMessageContext wmc, UserGameCommand cmd) {
+  private void connectToGame(WsMessageContext wmc, UserGameCommand cmd) throws DataAccessException, UnauthorizedException {
+    var user = db.userDao.getAuthUser(cmd.getAuthToken());
+    if (user == null) {
+      throw new UnauthorizedException();
+    }
+
+    var username = user.username;
+    var game = db.gameDao.getGame(cmd.getGameID());
+    
     var gameChannel = "game/" + cmd.getGameID();
     var notif = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+    notif.message = username + " joined the game";
+    if (username.equals(game.blackUsername)) {
+      notif.message += " as black";
+    } else if (username.equals(game.whiteUsername)) {
+      notif.message += " as white";
+    }
     clients.broadcast(gameChannel, gson.toJson(notif));
     clients.subscribeClient(wmc, gameChannel);
-    
+
     var loadGame = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+    loadGame.game = game;
     wmc.send(gson.toJson(loadGame));
   }
 }

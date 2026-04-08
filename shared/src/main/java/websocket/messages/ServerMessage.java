@@ -2,6 +2,8 @@ package websocket.messages;
 
 import java.util.Objects;
 
+import datamodel.GameData;
+
 /**
  * Represents a Message the server can send through a WebSocket
  * <p>
@@ -10,6 +12,9 @@ import java.util.Objects;
  */
 public class ServerMessage {
     ServerMessageType serverMessageType;
+    public GameData game;       // for type LOAD_GAME
+    public String errorMessage; // for type ERROR
+    public String message;      // for type NOTIFICATION
 
     public enum ServerMessageType {
         LOAD_GAME,
