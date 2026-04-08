@@ -31,7 +31,8 @@ public class PlayGameView extends ObserveGameView {
 
   @Override
   public void draw() {
-    console.printf("%s", gameBoardString(game, perspective));
+    System.out.printf("%s\n> ", gameBoardString(game, perspective));
+    System.out.flush();
   }
 
   @Override

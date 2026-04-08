@@ -139,6 +139,9 @@ public class PostloginView extends ReplView {
       availableColors.add("b");
     } else {
       players += " - Black: " + game.blackUsername + "\n";
+      if (game.blackUsername.equals(username)) {
+        availableColors.add("b");
+      }
     }
 
     if (game.whiteUsername == null) {
@@ -146,9 +149,17 @@ public class PostloginView extends ReplView {
       availableColors.add("w");
     } else {
       players += " - White: " + game.whiteUsername;
+      if (game.blackUsername.equals(username)) {
+        availableColors.add("b");
+      }
     }
 
     console.printf("%s\n", players);
+
+    if (availableColors.isEmpty()) {
+      console.printf("This game is already full, use 'observe' to observe the game\n");
+      return;
+    }
 
     var color = console.readLine("\nChoose your color (%s): ", String.join("/", availableColors));
     if (!availableColors.contains(color)) {
@@ -169,8 +180,14 @@ public class PostloginView extends ReplView {
     };
 
     try {
-      var request = new JoinGameRequest(color, game.gameID);
-      serverFacade.joinGame(request, authToken);
+      if (
+        (team == ChessGame.TeamColor.BLACK && game.blackUsername == null) ||
+        (team == ChessGame.TeamColor.WHITE && game.whiteUsername == null)
+      ) {
+        // Newly joining the game
+        var request = new JoinGameRequest(color, game.gameID);
+        serverFacade.joinGame(request, authToken);
+      }
 
       switch (team) {
         case BLACK -> game.blackUsername = username;

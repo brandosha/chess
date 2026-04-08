@@ -39,6 +39,16 @@ public class ObserveGameView extends ReplView {
     }
   }
 
+  @Override
+  public void close() {
+    try {
+      wsFacade.disconnect();
+      super.close();
+    } catch (IOException e) {
+      console.printf("Failed to disconnect:\n%s\n", e.getMessage());
+    }
+  }
+
   void recvMessage(ServerMessage msg) {
     switch (msg.getServerMessageType()) {
       case LOAD_GAME -> loadGame(msg.game);
