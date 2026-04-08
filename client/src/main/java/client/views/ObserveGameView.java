@@ -19,7 +19,7 @@ public class ObserveGameView extends ReplView {
   private final ServerFacade serverFacade;
   private WebSocketFacade wsFacade;
   private final String authToken;
-  private GameData game;
+  GameData game;
 
   public ObserveGameView(ServerFacade serverFacade, String authToken, GameData game) {
     this.serverFacade = serverFacade;
@@ -47,7 +47,7 @@ public class ObserveGameView extends ReplView {
 
   void loadGame(GameData game) {
     this.game = game;
-    drawGame();
+    draw();
   }
 
   @Override
@@ -59,14 +59,14 @@ public class ObserveGameView extends ReplView {
     }
 
     switch (argv[0]) {
-      case "d", "draw" -> drawGame();
+      case "d", "draw" -> draw();
       case "s", "stop" -> close();
       case "h", "help" -> help();
       default -> console.printf("Unknown command \"%s\"\n", argv[0]);
     }
   }
 
-  public void drawGame() {
+  public void draw() {
     // We can't use console because it's synchronized but this should
     // be asynchrounous because it's drawn in response to a WebSocket event
     System.out.printf("%s\n> ", gameBoardString(game, ChessGame.TeamColor.WHITE));

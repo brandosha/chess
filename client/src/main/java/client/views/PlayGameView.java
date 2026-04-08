@@ -1,30 +1,16 @@
 package client.views;
 
 import chess.ChessGame;
-import client.repl.ReplView;
 import client.server.ServerFacade;
-import client.server.WebSocketFacade;
 import datamodel.GameData;
 
-public class PlayGameView extends ReplView {
+public class PlayGameView extends ObserveGameView {
   
-  private final ServerFacade serverFacade;
-  private WebSocketFacade wsFacade;
-  private final String authToken;
-  private final GameData game;
   private final ChessGame.TeamColor perspective;
 
   public PlayGameView(ServerFacade serverFacade, String authToken, GameData game, ChessGame.TeamColor perspective) {
-    this.serverFacade = serverFacade;
-    this.authToken = authToken;
-    this.game = game;
+    super(serverFacade, authToken, game);
     this.perspective = perspective;
-  }
-
-  @Override
-  public void onAppear() {
-    help();
-    draw();
   }
 
   @Override
@@ -43,10 +29,12 @@ public class PlayGameView extends ReplView {
     }
   }
 
+  @Override
   public void draw() {
-    console.printf("%s", ObserveGameView.gameBoardString(game, perspective));
+    console.printf("%s", gameBoardString(game, perspective));
   }
 
+  @Override
   public void help() {
     String helpText = """
 
