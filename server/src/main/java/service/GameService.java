@@ -22,7 +22,7 @@ public class GameService extends BaseService {
     checkAuth(authToken);
 
     var newGame = db.gameDao.createGame(
-      new GameData(null, null, null, req.gameName, new ChessGame())
+      new GameData(null, null, null, req.gameName, new ChessGame(), false)
     );
 
     return new CreateGameResponse(newGame.gameID);

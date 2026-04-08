@@ -15,7 +15,7 @@ public class GameDaoTests {
 
   @Test
   public void createGamePositive() throws DataAccessException {
-    var game = new GameData(null, null, null, "gname", new ChessGame());
+    var game = new GameData(null, null, null, "gname", new ChessGame(), false);
     var result = dao.createGame(game);
     assertNotEquals(null, result);
 
@@ -25,17 +25,17 @@ public class GameDaoTests {
 
   @Test
   public void createGameNegative() {
-    var game1 = new GameData(2, null, null, "gname", new ChessGame());
+    var game1 = new GameData(2, null, null, "gname", new ChessGame(), false);
     assertThrows(DataAccessException.class, () -> dao.createGame(game1));
 
-    var game2 = new GameData(null, null, null, null, new ChessGame());
+    var game2 = new GameData(null, null, null, null, new ChessGame(), false);
     assertThrows(DataAccessException.class, () -> dao.createGame(game2));
   }
 
   @Test
   public void updateGamePositive() throws DataAccessException {
     var chess = new ChessGame();
-    var game = new GameData(null, null, null, "gname", chess);
+    var game = new GameData(null, null, null, "gname", chess, false);
     game = dao.createGame(game);
     
     game.whiteUsername = "wuser";
@@ -46,13 +46,13 @@ public class GameDaoTests {
 
   @Test
   public void updateGameNegative() {
-    var game1 = new GameData(null, null, null, "gname", new ChessGame());
+    var game1 = new GameData(null, null, null, "gname", new ChessGame(), false);
     assertThrows(DataAccessException.class, () -> dao.updateGame(game1));
   }
 
   @Test
   public void getGamePositive() throws DataAccessException {
-    var game = new GameData(null, null, null, "gname", new ChessGame());
+    var game = new GameData(null, null, null, "gname", new ChessGame(), false);
     game = dao.createGame(game);
 
     assertEquals(game, dao.getGame(game.gameID));
@@ -60,7 +60,7 @@ public class GameDaoTests {
 
   @Test
   public void getGameNegative() throws DataAccessException {
-    var game = new GameData(-1, null, null, "gname", new ChessGame());
+    var game = new GameData(-1, null, null, "gname", new ChessGame(), false);
     assertThrows(DataAccessException.class, () -> dao.updateGame(game));
   }
 
@@ -68,9 +68,9 @@ public class GameDaoTests {
   public void testListGames() throws DataAccessException {
     dao.clear();
     GameData[] games = {
-      new GameData(null, null, null, "game1", new ChessGame()),
-      new GameData(null, null, null, "game2", new ChessGame()),
-      new GameData(null, null, null, "game3", new ChessGame())
+      new GameData(null, null, null, "game1", new ChessGame(), false),
+      new GameData(null, null, null, "game2", new ChessGame(), false),
+      new GameData(null, null, null, "game3", new ChessGame(), false)
     };
 
     var gamesSet = new HashSet<GameData>();

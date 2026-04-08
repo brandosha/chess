@@ -23,7 +23,8 @@ public class GameDaoSQL implements GameDao {
       + "  name VARCHAR(32) NOT NULL,"
       + "  whiteUsername VARCHAR(32),"
       + "  blackUsername VARCHAR(32),"
-      + "  gameState VARCHAR(2048) NOT NULL"
+      + "  gameState VARCHAR(2048) NOT NULL,"
+      + "  gameOver BOOLEAN NOT NULL"
       + ")";
     try (var conn = DatabaseManager.getConnection()) {
       try (var statement = conn.createStatement()) {
@@ -54,8 +55,8 @@ public class GameDaoSQL implements GameDao {
     }
 
     var insert = "INSERT INTO " + tableName
-      + "  (name, whiteUsername, blackUsername, gameState)"
-      + "  VALUES (?, ?, ?, ?);";
+      + "  (name, whiteUsername, blackUsername, gameState, gameOver)"
+      + "  VALUES (?, ?, ?, ?, ?);";
 
     try (var conn = DatabaseManager.getConnection()) {
       try (var statement = conn.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS)) {
@@ -63,6 +64,7 @@ public class GameDaoSQL implements GameDao {
         statement.setString(2, game.whiteUsername);
         statement.setString(3, game.blackUsername);
         statement.setString(4, gson.toJson(game.game));
+        statement.setBoolean(5, game.gameOver);
         statement.executeUpdate();
 
         var rkeys = statement.getGeneratedKeys();
@@ -85,7 +87,7 @@ public class GameDaoSQL implements GameDao {
     }
 
     var update = "UPDATE " + tableName + " SET "
-      + "  name = ?, whiteUsername = ?, blackUsername = ?, gameState = ?"
+      + "  name = ?, whiteUsername = ?, blackUsername = ?, gameState = ?, gameOver = ?"
       + "  WHERE id = ?";
     
     try (var conn = DatabaseManager.getConnection()) {
@@ -96,7 +98,8 @@ public class GameDaoSQL implements GameDao {
         statement.setString(2, game.whiteUsername);
         statement.setString(3, game.blackUsername);
         statement.setString(4, gson.toJson(game.game));
-        statement.setInt(5, game.gameID);
+        statement.setBoolean(5, game.gameOver);
+        statement.setInt(6, game.gameID);
         var rowsUpdated = statement.executeUpdate();
 
         if (rowsUpdated == 1) {
@@ -116,7 +119,7 @@ public class GameDaoSQL implements GameDao {
 
   @Override
   public GameData getGame(int id) throws DataAccessException {
-    var select = "SELECT id, whiteUsername, blackUsername, name, gameState FROM " + tableName
+    var select = "SELECT id, whiteUsername, blackUsername, name, gameState, gameOver FROM " + tableName
       + "  WHERE id = ?";
 
     try (var conn = DatabaseManager.getConnection()) {
@@ -130,7 +133,8 @@ public class GameDaoSQL implements GameDao {
             results.getString(2),
             results.getString(3),
             results.getString(4),
-            gson.fromJson(gameJson, ChessGame.class)
+            gson.fromJson(gameJson, ChessGame.class),
+            results.getBoolean(6)
           );
         }
       }
@@ -143,7 +147,7 @@ public class GameDaoSQL implements GameDao {
 
   @Override
   public Collection<GameData> listGames() throws DataAccessException {
-    var select = "SELECT id, whiteUsername, blackUsername, name, gameState FROM " + tableName;
+    var select = "SELECT id, whiteUsername, blackUsername, name, gameState, gameOver FROM " + tableName;
 
     var list = new ArrayList<GameData>();
     try (var conn = DatabaseManager.getConnection()) {
@@ -158,7 +162,8 @@ public class GameDaoSQL implements GameDao {
             results.getString(2),
             results.getString(3),
             results.getString(4),
-            gson.fromJson(gameJson, ChessGame.class)
+            gson.fromJson(gameJson, ChessGame.class),
+            results.getBoolean(6)
           );
 
           list.add(data);

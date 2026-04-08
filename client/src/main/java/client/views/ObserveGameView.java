@@ -45,7 +45,6 @@ public class ObserveGameView extends ReplView {
   @Override
   public void close() {
     try {
-      wsFacade.leaveGame(game.gameID, authToken);
       wsFacade.disconnect();
       super.close();
     } catch (IOException e) {
@@ -89,7 +88,7 @@ public class ObserveGameView extends ReplView {
     switch (argv[0]) {
       case "d", "draw" -> draw();
       case "i", "highlight" -> highlight(argv);
-      case "s", "stop" -> close();
+      case "l", "leave" -> leave();
       case "h", "help" -> help();
       default -> console.printf("Unknown command \"%s\"\n", argv[0]);
     }
@@ -130,13 +129,23 @@ public class ObserveGameView extends ReplView {
     System.out.flush();
   }
 
+  public void leave() {
+    try {
+      wsFacade.leaveGame(game.gameID, authToken);
+      Thread.sleep(300);
+      close();
+    } catch (Exception e) {
+      console.printf("Failed to leave:\n%s\n", e.getMessage());
+    }
+  }
+
   public void help() {
     String helpText = """
 
         [d]raw                | Redraw the game board
         h[i]ghlight <square>  | Highlight moves for a piece at the given square (ex. e2)
         [h]elp                | Show this help message
-        [s]top                | Stop observing
+        [l]eave               | Stop observing and go back
 
       """;
     

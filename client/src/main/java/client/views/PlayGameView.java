@@ -28,7 +28,8 @@ public class PlayGameView extends ObserveGameView {
       case "d", "draw" -> draw();
       case "i", "highlight" -> highlight(argv);
       case "m", "move" -> move(argv);
-      case "l", "leave" -> close();
+      case "r", "resign" -> resign();
+      case "l", "leave" -> leave();
       case "h", "help" -> help();
       default -> console.printf("Unknown command \"%s\"\n", argv[0]);
     }
@@ -61,6 +62,19 @@ public class PlayGameView extends ObserveGameView {
     }
   }
 
+  public void resign() {
+    var confirm = console.readLine("Are you sure you want to resign? (yes/no) ");
+    if (confirm.equals("yes")) {
+      try {
+        wsFacade.resign(game.gameID, authToken);
+        Thread.sleep(300);
+        close();
+      } catch (Exception e) {
+        console.printf("Failed to resign:\n%s\n", e.getMessage());
+      }
+    }
+  }
+
   @Override
   public void help() {
     String helpText = """
@@ -68,6 +82,7 @@ public class PlayGameView extends ObserveGameView {
         [d]raw                | Redraw the game board
         h[i]ghlight <square>  | Highlight moves for a piece at a certain square (ex. e2)
         [m]ove <move>         | Make a move from one square to another (ex. e2e4)
+        [r]esign              | Resign from the game
         [h]elp                | Show this help message
         [l]eave               | Leave the game
 

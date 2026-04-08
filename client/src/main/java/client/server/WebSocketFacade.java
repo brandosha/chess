@@ -63,6 +63,11 @@ public class WebSocketFacade extends Endpoint {
     sendCommand(cmd);
   }
 
+  public void resign(int gameID, String authToken) throws IOException {
+    var cmd = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+    sendCommand(cmd);
+  }
+
   public void leaveGame(int gameID, String authToken) throws IOException {
     var cmd = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
     sendCommand(cmd);

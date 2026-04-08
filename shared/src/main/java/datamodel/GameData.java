@@ -10,13 +10,15 @@ public class GameData {
   public String blackUsername;
   public String gameName;
   public ChessGame game;
+  public Boolean gameOver;
 
-  public GameData(Integer gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
+  public GameData(Integer gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game, Boolean gameOver) {
     this.gameID = gameID;
     this.whiteUsername = whiteUsername;
     this.blackUsername = blackUsername;
     this.gameName = gameName;
     this.game = game;
+    this.gameOver = gameOver;
   }
 
 

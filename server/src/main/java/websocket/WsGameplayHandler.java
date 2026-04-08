@@ -49,6 +49,7 @@ public class WsGameplayHandler implements WsConnectHandler, WsMessageHandler, Ws
       switch (cmd.getCommandType()) {
         case CONNECT -> connectToGame(wmc, cmd);
         case MAKE_MOVE -> makeMove(wmc, cmd);
+        case RESIGN -> resign(wmc, cmd);
         case LEAVE -> leaveGame(wmc, cmd);
       }
 
@@ -102,6 +103,9 @@ public class WsGameplayHandler implements WsConnectHandler, WsMessageHandler, Ws
 
     var gdata = db.gameDao.getGame(cmd.getGameID());
     var game = gdata.game;
+    if (gdata.gameOver) {
+      throw new UnauthorizedException("The game is over");
+    }
 
     ChessGame.TeamColor userTeam = null;
     if (username.equals(gdata.blackUsername)) {
@@ -130,19 +134,42 @@ public class WsGameplayHandler implements WsConnectHandler, WsMessageHandler, Ws
     clients.broadcast(gameChannel, gson.toJson(notif), wmc);
 
     var otherTeam = game.getTeamTurn();
+    notif.message = null;
     if (game.isInCheckmate(otherTeam)) {
-      notif = new ServerMessage(NOTIFICATION);
       notif.message = "checkmate";
-      clients.broadcast(gameChannel, gson.toJson(notif));
     } else if (game.isInStalemate(otherTeam)) {
-      notif = new ServerMessage(NOTIFICATION);
       notif.message = "stalemate";
-      clients.broadcast(gameChannel, gson.toJson(notif));
     } else if (game.isInCheck(otherTeam)) {
-      notif = new ServerMessage(NOTIFICATION);
       notif.message = "check";
+    }
+
+    if (notif.message != null) {
       clients.broadcast(gameChannel, gson.toJson(notif));
     }
+  }
+
+  private void resign(WsMessageContext wmc, UserGameCommand cmd) throws DataAccessException, UnauthorizedException {
+    var user = checkAuth(cmd);
+    var username = user.username;
+
+    var game = db.gameDao.getGame(cmd.getGameID());
+    if (game.gameOver) {
+      throw new UnauthorizedException("The game is over");
+    }
+    
+    if (username.equals(game.blackUsername) || username.equals(game.whiteUsername)) {
+      game.gameOver = true;
+      db.gameDao.updateGame(game);
+    } else {
+      throw new UnauthorizedException();
+    }
+    
+    var notif = new ServerMessage(NOTIFICATION);
+    notif.message = username + " resigned";
+
+    var gameChannel = "game/" + cmd.getGameID();
+    clients.broadcast(gameChannel, gson.toJson(notif));
+    clients.unsubscribeClient(wmc, gameChannel);
   }
 
   private void leaveGame(WsMessageContext wmc, UserGameCommand cmd) throws DataAccessException, UnauthorizedException {
