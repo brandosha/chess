@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import com.google.gson.Gson;
 
+import chess.ChessMove;
 import jakarta.websocket.ContainerProvider;
 import jakarta.websocket.DeploymentException;
 import jakarta.websocket.Endpoint;
@@ -53,6 +54,12 @@ public class WebSocketFacade extends Endpoint {
   public void connectToGame(int gameID, String authToken, Consumer<ServerMessage> listener) throws IOException {
     this.listener = listener;
     var cmd = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+    sendCommand(cmd);
+  }
+
+  public void makeMove(int gameID, String authToken, ChessMove move) throws IOException {
+    var cmd = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID);
+    cmd.move = move;
     sendCommand(cmd);
   }
 

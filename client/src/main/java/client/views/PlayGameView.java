@@ -1,6 +1,9 @@
 package client.views;
 
+import java.io.IOException;
+
 import chess.ChessGame;
+import chess.ChessMove;
 import client.server.ServerFacade;
 import datamodel.GameData;
 
@@ -24,6 +27,7 @@ public class PlayGameView extends ObserveGameView {
     switch (argv[0]) {
       case "d", "draw" -> draw();
       case "i", "highlight" -> highlight(argv);
+      case "m", "move" -> move(argv);
       case "l", "leave" -> close();
       case "h", "help" -> help();
       default -> console.printf("Unknown command \"%s\"\n", argv[0]);
@@ -32,8 +36,29 @@ public class PlayGameView extends ObserveGameView {
 
   @Override
   public void draw() {
-    System.out.printf("%s\n> ", gameBoardString(game, perspective));
-    System.out.flush();
+    System.out.printf("%s\n", gameBoardString(game, perspective));
+  }
+
+  public void move(String[] argv) {
+    if (argv.length != 2) {
+      console.printf("Usage: %s <move>\n", argv[0]);
+      return;
+    }
+
+    var moveStr = argv[1];
+    var start = parsePos(moveStr.substring(0, 2));
+    var end = parsePos(moveStr.substring(2));
+
+    if (start == null || end == null) {
+      console.printf("'%s' is not a valid move", moveStr);
+      return;
+    }
+
+    try {
+      wsFacade.makeMove(game.gameID, authToken, new ChessMove(start, end, null));
+    } catch (IOException e) {
+      console.printf("Failed to send the move: %s\n", e.getMessage());
+    }
   }
 
   @Override
@@ -42,6 +67,7 @@ public class PlayGameView extends ObserveGameView {
 
         [d]raw                | Redraw the game board
         h[i]ghlight <square>  | Highlight moves for a piece at a certain square (ex. e2)
+        [m]ove <move>         | Make a move from one square to another (ex. e2e4)
         [h]elp                | Show this help message
         [l]eave               | Leave the game
 

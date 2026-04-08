@@ -57,7 +57,7 @@ public class ObserveGameView extends ReplView {
     switch (msg.getServerMessageType()) {
       case LOAD_GAME -> {
         this.game = msg.game;
-        draw();
+        drawWithPrompt();
       }
       case NOTIFICATION -> {
         var message =
@@ -98,7 +98,14 @@ public class ObserveGameView extends ReplView {
   public void draw() {
     // We can't use console because it's synchronized but this should
     // be asynchrounous because it's drawn in response to a WebSocket event
-    System.out.printf("%s\n> ", gameBoardString(game, ChessGame.TeamColor.WHITE));
+    System.out.printf("%s\n", gameBoardString(game, ChessGame.TeamColor.WHITE));
+  }
+
+  public void drawWithPrompt() {
+    // We can't use console because it's synchronized but this should
+    // be asynchrounous because it's drawn in response to a WebSocket event
+    draw();
+    System.out.print("> ");
     System.out.flush();
   }
 
