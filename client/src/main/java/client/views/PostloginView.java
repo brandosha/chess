@@ -70,6 +70,7 @@ public class PostloginView extends ReplView {
   public void create(String[] args) {
     if (args.length < 2) {
       console.printf("Usage: [c]reate <name>");
+      return;
     }
 
     String name = args[1];
