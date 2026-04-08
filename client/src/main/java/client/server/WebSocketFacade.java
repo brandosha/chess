@@ -35,7 +35,7 @@ public class WebSocketFacade extends Endpoint {
         @Override
         public void onMessage(String message) {
           var msg = gson.fromJson(message, ServerMessage.class);
-          System.out.println(msg);
+          System.err.println("[ws] Recieved " + message);
         }
       });
     } catch (DeploymentException | IOException | IllegalStateException e) {
@@ -44,6 +44,7 @@ public class WebSocketFacade extends Endpoint {
 
   private void sendCommand(UserGameCommand cmd) throws IOException {
     var json = gson.toJson(cmd);
+    System.err.println("[ws] Sending " + json);
     session.getBasicRemote().sendText(json);
   }
 

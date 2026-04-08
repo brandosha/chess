@@ -8,11 +8,11 @@ import datamodel.http.InvalidRequestException;
 import handler.DataHandler;
 import handler.GameHandler;
 import handler.UserHandler;
-import handler.WsGameplayHandler;
 import io.javalin.Javalin;
 import io.javalin.http.ExceptionHandler;
 import service.AlreadyTakenException;
 import service.UnauthorizedException;
+import websocket.WsGameplayHandler;
 
 public class Server {
 
