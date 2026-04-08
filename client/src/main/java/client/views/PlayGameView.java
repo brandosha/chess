@@ -23,6 +23,7 @@ public class PlayGameView extends ObserveGameView {
 
     switch (argv[0]) {
       case "d", "draw" -> draw();
+      case "i", "highlight" -> highlight(argv);
       case "l", "leave" -> close();
       case "h", "help" -> help();
       default -> console.printf("Unknown command \"%s\"\n", argv[0]);
@@ -35,20 +36,12 @@ public class PlayGameView extends ObserveGameView {
     System.out.flush();
   }
 
-  // public void leave() {
-  //   try {
-  //     wsFacade.leaveGame(game.gameID, authToken);
-  //     close();
-  //   } catch (IOException e) {
-  //     console.printf("Failed to leave game:\n%s", e.getMessage());
-  //   }
-  // }
-
   @Override
   public void help() {
     String helpText = """
 
         [d]raw                | Redraw the game board
+        h[i]ghlight <square>  | Highlight moves for a piece at a certain square (ex. e2)
         [h]elp                | Show this help message
         [l]eave               | Leave the game
 

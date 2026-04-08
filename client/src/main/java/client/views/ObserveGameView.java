@@ -1,9 +1,12 @@
 package client.views;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import client.repl.ReplView;
@@ -85,6 +88,7 @@ public class ObserveGameView extends ReplView {
 
     switch (argv[0]) {
       case "d", "draw" -> draw();
+      case "i", "highlight" -> highlight(argv);
       case "s", "stop" -> close();
       case "h", "help" -> help();
       default -> console.printf("Unknown command \"%s\"\n", argv[0]);
@@ -98,10 +102,32 @@ public class ObserveGameView extends ReplView {
     System.out.flush();
   }
 
+  public void highlight(String[] argv) {
+    if (argv.length != 2) {
+      console.printf("Usage: %s <square>\n", argv[0]);
+    }
+
+    var pos = parsePos(argv[1]);
+    if (pos == null) {
+      console.printf("'%s' is not a valid square\n", argv[1]);
+      return;
+    }
+
+    var piece = game.game.getBoard().getPiece(pos);
+    if (piece == null) {
+      console.printf("There is no piece at square '%s'\n", argv[1]);
+      return;
+    }
+
+    System.out.printf("%s\n> ", gameBoardString(game, ChessGame.TeamColor.WHITE, pos));
+    System.out.flush();
+  }
+
   public void help() {
     String helpText = """
 
         [d]raw                | Redraw the game board
+        h[i]ghlight <square>  | Highlight moves for a piece at the given square (ex. e2)
         [h]elp                | Show this help message
         [s]top                | Stop observing
 
@@ -110,14 +136,24 @@ public class ObserveGameView extends ReplView {
     console.printf(helpText);
   }
 
-  public static String gameBoardString(GameData g, ChessGame.TeamColor perspective) {
+  public static String gameBoardString(GameData g, ChessGame.TeamColor perspective, ChessPosition highlight) {
     ChessBoard board = g.game.getBoard();
     String s = "\n";
 
-    int height = ChessBoard.HEIGHT;
-    int width = ChessBoard.WIDTH;
+    final int height = ChessBoard.HEIGHT;
+    final int width = ChessBoard.WIDTH;
 
-    String files = "abcdefgh";
+    final String files = "abcdefgh";
+
+    Set<ChessPosition> highlightedSquares = new HashSet<>();
+    if (highlight != null) {
+      highlightedSquares.add(highlight);
+      final var moves = g.game.validMoves(highlight);
+      for (ChessMove move : moves) {
+        highlightedSquares.add(move.getEndPosition());
+      }
+    }
+    
 
     s += "  ";
     for (int c = 0; c < width; c++) {
@@ -143,10 +179,11 @@ public class ObserveGameView extends ReplView {
         }
 
         var pos = new ChessPosition(row, col);
+        var hi = highlightedSquares.contains(pos);
         if ((row + col) % 2 == 0) {
-          s += EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+          s += hi ? EscapeSequences.SET_BG_COLOR_GREEN : EscapeSequences.SET_BG_COLOR_DARK_GREEN;
         } else {
-          s += EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+          s += hi ? EscapeSequences.SET_BG_COLOR_GREEN : EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
         }
 
         var piece = board.getPiece(pos);
@@ -179,6 +216,29 @@ public class ObserveGameView extends ReplView {
     s += "\n\n";
 
     return s;
+  }
+
+  public static String gameBoardString(GameData g, ChessGame.TeamColor perspective) {
+    return gameBoardString(g, perspective, null);
+  }
+
+  public ChessPosition parsePos(String pos) {
+    if (pos.length() != 2) {
+      return null;
+    }
+
+    pos = pos.toLowerCase();
+    var col = pos.charAt(0) - 'a' + 1;
+    if (col < 1 || col > 8) {
+      return null;
+    }
+
+    var row = pos.charAt(1) - '0';
+    if (row < 1 || row > 8) {
+      return null;
+    }
+
+    return new ChessPosition(row, col);
   }
   
 }

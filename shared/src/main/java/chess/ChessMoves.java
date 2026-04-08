@@ -13,6 +13,12 @@ public class ChessMoves extends HashSet<ChessMove> {
     PieceType.QUEEN, PieceType.ROOK, PieceType.KNIGHT, PieceType.BISHOP
   };
 
+  public ChessMoves() {
+    this.board = null;
+    this.startPosition = null;
+    this.startPiece = null;
+  }
+
   public ChessMoves(ChessBoard board, ChessPosition startPosition) {
     this.board = board;
     this.startPosition = startPosition;
