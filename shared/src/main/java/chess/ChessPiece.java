@@ -92,6 +92,20 @@ public class ChessPiece {
         return str;
     }
 
+    public static String name(ChessPiece piece) {
+        if (piece == null) { return ""; }
+
+        return switch (piece.getPieceType()) {
+            case PAWN -> "pawn";
+            case KNIGHT -> "knight";
+            case BISHOP -> "bishop";
+            case ROOK -> "rook";
+            case QUEEN -> "queen";
+            case KING -> "king";
+            // default -> "";
+        };
+    }
+
     @Override
     public String toString() {
         return "ChessPiece [type=" + type + ", color=" + color + "]";

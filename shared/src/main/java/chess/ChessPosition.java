@@ -32,6 +32,11 @@ public class ChessPosition {
         return this.col;
     }
 
+    public String name() {
+        final String files = " abcdefgh";
+        return String.format("%c%d", files.charAt(col), row);
+    }
+
     public Boolean isValid() {
         return (row > 0 && row <= ChessBoard.HEIGHT && col > 0 && col <= ChessBoard.WIDTH);
     }

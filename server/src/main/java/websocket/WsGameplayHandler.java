@@ -3,6 +3,7 @@ package websocket;
 import com.google.gson.Gson;
 
 import chess.ChessGame;
+import chess.ChessPiece;
 import chess.InvalidMoveException;
 import dataaccess.DataAccessException;
 import dataaccess.Database;
@@ -121,6 +122,7 @@ public class WsGameplayHandler implements WsConnectHandler, WsMessageHandler, Ws
     }
 
     var move = cmd.move;
+    var piece = game.getBoard().getPiece(move.getStartPosition());
     game.makeMove(move);
 
     db.gameDao.updateGame(gdata);
@@ -130,7 +132,7 @@ public class WsGameplayHandler implements WsConnectHandler, WsMessageHandler, Ws
     clients.broadcast(gameChannel, gson.toJson(loadGame));
 
     var notif = new ServerMessage(NOTIFICATION);
-    notif.message = username + " moved";
+    notif.message = username + " moved " + ChessPiece.name(piece) + " to " + move.getEndPosition().name();
     clients.broadcast(gameChannel, gson.toJson(notif), wmc);
 
     var otherTeam = game.getTeamTurn();
@@ -156,7 +158,7 @@ public class WsGameplayHandler implements WsConnectHandler, WsMessageHandler, Ws
     if (game.gameOver) {
       throw new UnauthorizedException("The game is over");
     }
-    
+
     if (username.equals(game.blackUsername) || username.equals(game.whiteUsername)) {
       game.gameOver = true;
       db.gameDao.updateGame(game);
