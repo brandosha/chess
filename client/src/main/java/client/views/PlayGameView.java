@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece.PieceType;
 import client.server.ServerFacade;
 import datamodel.GameData;
 
@@ -51,12 +52,58 @@ public class PlayGameView extends ObserveGameView {
     var end = parsePos(moveStr.substring(2));
 
     if (start == null || end == null) {
-      console.printf("'%s' is not a valid move", moveStr);
+      console.printf("'%s' is not a valid move\n", moveStr);
       return;
     }
 
+    
+
+    var board = game.game.getBoard();
+    var movingPiece = board.getPiece(start);
+    if (movingPiece == null) {
+      console.printf("No piece at %s", start);
+      return;
+    }
+
+    PieceType promotionPiece = null;
+
+    if (movingPiece.getPieceType() == PieceType.PAWN) {
+      // Check if promotion
+      Boolean willPromote = false;
+      var moves = game.game.validMoves(start);
+      for (ChessMove m : moves) {
+        if (m.getPromotionPiece() != null && m.getEndPosition().equals(end)) {
+          willPromote = true;
+          break;
+        }
+      }
+
+      if (willPromote) {
+        String prompt = """
+
+              Select a piece to promote to:
+              - [q]ueen
+              - [r]ook
+              - [b]ishop
+              - k[n]ight
+            
+            """;
+        var promotion = console.readLine("%s> ", prompt);
+        switch (promotion) {
+          case "q", "queen" -> promotionPiece = PieceType.QUEEN;
+          case "r", "roook" -> promotionPiece = PieceType.ROOK;
+          case "b", "bishop" -> promotionPiece = PieceType.BISHOP;
+          case "n", "knight" -> promotionPiece = PieceType.KNIGHT;
+          default -> {
+            console.printf("'%s' is not a valid promotion piece\n", promotion);
+          }
+        }
+      }
+    }
+
     try {
-      wsFacade.makeMove(game.gameID, authToken, new ChessMove(start, end, null));
+      var move = new ChessMove(start, end, promotionPiece);
+      wsFacade.makeMove(game.gameID, authToken, move);
     } catch (IOException e) {
       console.printf("Failed to send the move: %s\n", e.getMessage());
     }
